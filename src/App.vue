@@ -1,27 +1,28 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png" />
-  <HelloWorld msg="Welcome to Your Vue.js + TypeScript App" />
+  <div>
+    <button @click="play">Play</button>
+    <button @click="stop">Stop</button>
+    <input
+      type="range"
+      min="0"
+      max="2"
+      step="0.1"
+      v-model="volume"
+      @input="updateVolume(volume)"
+    />
+    <p>Volume: {{ volume }}</p>
+  </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import HelloWorld from "./components/HelloWorld.vue";
+import { useAudio } from "@/utils/useAudio";
 
 export default defineComponent({
-  name: "App",
-  components: {
-    HelloWorld,
+  setup() {
+    const { play, stop, volume, updateVolume } = useAudio("../assets/test.mp3");
+
+    return { play, stop, volume, updateVolume };
   },
 });
 </script>
-
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
