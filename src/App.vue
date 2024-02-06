@@ -1,6 +1,7 @@
 <template>
   <div>
     <button @click="play">Play</button>
+    <button @click="pause">Pause</button>
     <button @click="stop">Stop</button>
     <div>
       <label for="volumeControl">볼륨</label>
@@ -36,8 +37,15 @@ import { useAudioVisualizer } from "./utils/useAudioVisualizer";
 export default defineComponent({
   setup() {
     const canvas = ref<HTMLCanvasElement | null>(null);
-    const { play, stop, state, updateVolume, updatePlaybackRate, getAnalyser } =
-      useAudio("../assets/test.mp3");
+    const {
+      play,
+      pause,
+      stop,
+      state,
+      updateVolume,
+      updatePlaybackRate,
+      getAnalyser,
+    } = useAudio("../assets/test.mp3");
     const { startVisualization } = useAudioVisualizer(getAnalyser(), canvas);
 
     onMounted(() => {
@@ -46,7 +54,15 @@ export default defineComponent({
       }
     });
 
-    return { play, stop, state, updateVolume, updatePlaybackRate, canvas };
+    return {
+      play,
+      pause,
+      stop,
+      state,
+      updateVolume,
+      updatePlaybackRate,
+      canvas,
+    };
   },
 });
 </script>

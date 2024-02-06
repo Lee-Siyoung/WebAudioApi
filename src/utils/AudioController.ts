@@ -4,6 +4,9 @@ export class AudioController {
   private audioBuffer?: AudioBuffer;
   private sourceNode?: AudioBufferSourceNode;
   private analyser: AnalyserNode;
+  private startTime: number;
+  private pauseTime: number;
+  private isPlaying: boolean;
 
   constructor() {
     this.audioContext = new AudioContext();
@@ -12,6 +15,9 @@ export class AudioController {
     this.analyser.fftSize = 256;
     this.gainNode.connect(this.analyser);
     this.analyser.connect(this.audioContext.destination);
+    this.startTime = 0;
+    this.pauseTime = 0;
+    this.isPlaying = false;
   }
 
   getAnalyser(): AnalyserNode {
@@ -26,18 +32,34 @@ export class AudioController {
 
   play(): void {
     if (this.audioBuffer) {
+      if (this.isPlaying) {
+        return;
+      }
       this.sourceNode = this.audioContext.createBufferSource();
       this.sourceNode.buffer = this.audioBuffer;
       this.sourceNode.connect(this.gainNode);
-      this.sourceNode.start(0);
+      this.sourceNode.start(0, this.pauseTime);
+      this.startTime = this.audioContext.currentTime - this.pauseTime;
+      this.isPlaying = true;
+    }
+  }
+
+  pause(): void {
+    if (this.isPlaying && this.sourceNode) {
+      this.sourceNode.stop();
+      this.pauseTime = this.audioContext.currentTime - this.startTime;
+      this.isPlaying = false;
     }
   }
 
   stop(): void {
-    if (this.sourceNode) {
+    if (this.isPlaying && this.sourceNode) {
       this.sourceNode.stop();
+      this.pauseTime = 0;
+      this.isPlaying = false;
     }
   }
+
   setVolume(volume: number): void {
     this.gainNode.gain.value = volume;
   }

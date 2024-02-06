@@ -19,6 +19,10 @@ export function useAudio(url: string) {
     }
   };
 
+  const pause = () => {
+    audioController.pause();
+  };
+
   const stop = () => {
     audioController.stop();
   };
@@ -37,5 +41,13 @@ export function useAudio(url: string) {
     return audioController.getAnalyser();
   };
 
-  return { play, stop, state, updateVolume, updatePlaybackRate, getAnalyser };
+  return {
+    play,
+    pause,
+    stop,
+    state,
+    updateVolume,
+    updatePlaybackRate,
+    getAnalyser,
+  };
 }
