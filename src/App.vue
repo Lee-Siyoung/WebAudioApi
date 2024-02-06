@@ -20,23 +20,33 @@
         max="2"
         step="0.1"
         v-model="state.playbackRate"
-        @input="updatePlaybackRat(state.playbackRate)"
+        @input="updatePlaybackRate(state.playbackRate)"
       />
       <p>PlayRate: {{ state.playbackRate }}</p>
     </div>
+    <canvas ref="canvas" width="400" height="200"></canvas>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, onMounted, ref } from "vue";
 import { useAudio } from "@/utils/useAudio";
+import { useAudioVisualizer } from "./utils/useAudioVisualizer";
 
 export default defineComponent({
   setup() {
-    const { play, stop, state, updateVolume, updatePlaybackRat } =
+    const canvas = ref<HTMLCanvasElement | null>(null);
+    const { play, stop, state, updateVolume, updatePlaybackRate, getAnalyser } =
       useAudio("../assets/test.mp3");
+    const { startVisualization } = useAudioVisualizer(getAnalyser(), canvas);
 
-    return { play, stop, state, updateVolume, updatePlaybackRat };
+    onMounted(() => {
+      if (canvas.value) {
+        startVisualization();
+      }
+    });
+
+    return { play, stop, state, updateVolume, updatePlaybackRate, canvas };
   },
 });
 </script>

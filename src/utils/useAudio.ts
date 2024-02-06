@@ -28,10 +28,14 @@ export function useAudio(url: string) {
     audioController.setVolume(state.volume);
   };
 
-  const updatePlaybackRat = (newRate: number) => {
+  const updatePlaybackRate = (newRate: number) => {
     state.playbackRate = newRate;
     audioController.setPlaybackRate(state.playbackRate);
   };
 
-  return { play, stop, state, updateVolume, updatePlaybackRat };
+  const getAnalyser = () => {
+    return audioController.getAnalyser();
+  };
+
+  return { play, stop, state, updateVolume, updatePlaybackRate, getAnalyser };
 }

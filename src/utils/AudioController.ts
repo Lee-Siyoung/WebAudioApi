@@ -3,11 +3,19 @@ export class AudioController {
   private gainNode: GainNode;
   private audioBuffer?: AudioBuffer;
   private sourceNode?: AudioBufferSourceNode;
+  private analyser: AnalyserNode;
 
   constructor() {
     this.audioContext = new AudioContext();
     this.gainNode = this.audioContext.createGain();
-    this.gainNode.connect(this.audioContext.destination);
+    this.analyser = this.audioContext.createAnalyser();
+    this.analyser.fftSize = 256;
+    this.gainNode.connect(this.analyser);
+    this.analyser.connect(this.audioContext.destination);
+  }
+
+  getAnalyser(): AnalyserNode {
+    return this.analyser;
   }
 
   async loadAudio(url: string): Promise<void> {
