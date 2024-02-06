@@ -9,6 +9,17 @@
       {{ state.isCompressionActive ? "압축" : "압축품" }}
     </button>
     <div>
+      <input
+        type="range"
+        min="0"
+        :max="state.totalTime"
+        step="1"
+        v-model="state.currentTime"
+        @input="setCurrentTime(state.currentTime)"
+      />
+      <p>{{ formatCurrentTime }} / {{ formatTotalTime }}</p>
+    </div>
+    <div>
       <label for="volumeControl">볼륨</label>
       <input
         type="range"
@@ -36,10 +47,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from "vue";
+import { computed, defineComponent, onMounted, reactive, ref } from "vue";
 import { useAudio } from "@/utils/useAudio";
 import { useAudioVisualizer } from "./utils/useAudioVisualizer";
-
+import { formatTime } from "@/utils/FormatTime";
 export default defineComponent({
   setup() {
     const canvas = ref<HTMLCanvasElement | null>(null);
@@ -53,9 +64,11 @@ export default defineComponent({
       updatePlaybackRate,
       getAnalyser,
       Compression,
+      setCurrentTime,
     } = useAudio("../assets/test.mp3");
     const { startVisualization } = useAudioVisualizer(getAnalyser(), canvas);
-
+    const formatCurrentTime = computed(() => formatTime(state.currentTime));
+    const formatTotalTime = computed(() => formatTime(state.totalTime));
     onMounted(() => {
       if (canvas.value) {
         startVisualization();
@@ -72,6 +85,9 @@ export default defineComponent({
       updatePlaybackRate,
       canvas,
       Compression,
+      setCurrentTime,
+      formatCurrentTime,
+      formatTotalTime,
     };
   },
 });

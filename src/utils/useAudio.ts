@@ -9,10 +9,21 @@ export function useAudio(url: string) {
     isLoaded: false,
     isCompressionActive: false,
     isMute: false,
+    currentTime: 0,
+    totalTime: 0,
   });
+
+  setInterval(() => {
+    state.currentTime = audioController.getCurrentTime();
+  }, 100);
+
+  const setCurrentTime = (time: number) => {
+    audioController.setCurrentTime(time);
+  };
 
   audioController.loadAudio(url).then(() => {
     state.isLoaded = true;
+    state.totalTime = audioController.getTotalDuration();
   });
 
   const play = () => {
@@ -63,5 +74,6 @@ export function useAudio(url: string) {
     updatePlaybackRate,
     getAnalyser,
     Compression,
+    setCurrentTime,
   };
 }

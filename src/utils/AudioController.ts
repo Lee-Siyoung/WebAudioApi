@@ -8,10 +8,12 @@ export class AudioController {
   private startTime: number;
   private pauseTime: number;
   private lastVolume: number;
+  private totalDuration: number;
   private isPlaying: boolean;
   private isCompressionActive: boolean;
 
   constructor() {
+    this.totalDuration = 0;
     this.audioContext = new AudioContext();
     this.gainNode = this.audioContext.createGain();
     this.compressor = this.audioContext.createDynamicsCompressor();
@@ -62,9 +64,14 @@ export class AudioController {
   }
 
   async loadAudio(url: string): Promise<void> {
-    const response = await fetch(url);
-    const arrayBuffer = await response.arrayBuffer();
-    this.audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+    try {
+      const response = await fetch(url);
+      const arrayBuffer = await response.arrayBuffer();
+      this.audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+      this.totalDuration = this.audioBuffer.duration;
+    } catch (error) {
+      console.error("오디오 로딩 오류: ", error);
+    }
   }
 
   play(): void {
@@ -76,7 +83,7 @@ export class AudioController {
       this.sourceNode.buffer = this.audioBuffer;
       this.sourceNode.connect(this.gainNode);
       this.sourceNode.start(0, this.pauseTime);
-      this.startTime = this.audioContext.currentTime - this.pauseTime;
+      this.startTime = this.audioContext.currentTime;
       this.isPlaying = true;
     }
   }
@@ -84,7 +91,7 @@ export class AudioController {
   pause(): void {
     if (this.isPlaying && this.sourceNode) {
       this.sourceNode.stop();
-      this.pauseTime = this.audioContext.currentTime - this.startTime;
+      this.pauseTime += this.audioContext.currentTime - this.startTime;
       this.isPlaying = false;
     }
   }
@@ -113,5 +120,24 @@ export class AudioController {
     if (this.sourceNode) {
       this.sourceNode.playbackRate.value = rate;
     }
+  }
+  getCurrentTime(): number {
+    if (this.isPlaying && this.sourceNode && this.audioContext) {
+      return this.audioContext.currentTime - this.startTime + this.pauseTime;
+    }
+    return this.pauseTime;
+  }
+
+  setCurrentTime(time: number): void {
+    if (this.audioBuffer) {
+      this.pauseTime = time;
+      if (this.isPlaying) {
+        this.play(); // 현재 재생 중이면 재생을 재시작
+      }
+    }
+  }
+
+  getTotalDuration(): number {
+    return this.totalDuration;
   }
 }
