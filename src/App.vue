@@ -3,10 +3,12 @@
     <button @click="play">Play</button>
     <button @click="pause">Pause</button>
     <button @click="stop">Stop</button>
-    <button @click="mute">{{ state.isMute ? "음소거해제" : "음소거" }}</button>
+    <button @click="mute">
+      {{ state.isMute ? "음소거 중" : "음소거 안함" }}
+    </button>
 
     <button @click="Compression">
-      {{ state.isCompressionActive ? "압축" : "압축품" }}
+      {{ state.isCompressionActive ? "압축" : "압축 품" }}
     </button>
     <div>
       <input
