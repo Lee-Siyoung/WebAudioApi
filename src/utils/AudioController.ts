@@ -33,4 +33,9 @@ export class AudioController {
   setVolume(volume: number): void {
     this.gainNode.gain.value = volume;
   }
+  setPlaybackRate(rate: number): void {
+    if (this.sourceNode) {
+      this.sourceNode.playbackRate.value = rate;
+    }
+  }
 }
