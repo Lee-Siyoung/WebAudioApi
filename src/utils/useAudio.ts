@@ -28,6 +28,10 @@ export function useAudio(url: string) {
     audioController.stop();
   };
 
+  const mute = () => {
+    audioController.mute();
+  };
+
   const updateVolume = (newVolume: number) => {
     state.volume = newVolume;
     audioController.setVolume(state.volume);
@@ -51,6 +55,7 @@ export function useAudio(url: string) {
     play,
     pause,
     stop,
+    mute,
     state,
     updateVolume,
     updatePlaybackRate,

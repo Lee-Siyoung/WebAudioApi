@@ -3,6 +3,7 @@
     <button @click="play">Play</button>
     <button @click="pause">Pause</button>
     <button @click="stop">Stop</button>
+    <button @click="mute">Mute</button>
 
     <button @click="toggleCompression">
       압축 {{ state.isCompressionActive }}
@@ -45,6 +46,7 @@ export default defineComponent({
       play,
       pause,
       stop,
+      mute,
       state,
       updateVolume,
       updatePlaybackRate,
@@ -63,6 +65,7 @@ export default defineComponent({
       play,
       pause,
       stop,
+      mute,
       state,
       updateVolume,
       updatePlaybackRate,

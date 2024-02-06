@@ -7,6 +7,7 @@ export class AudioController {
   private analyser: AnalyserNode;
   private startTime: number;
   private pauseTime: number;
+  private lastVolume: number;
   private isPlaying: boolean;
   private isCompressionActive: boolean;
 
@@ -35,6 +36,7 @@ export class AudioController {
 
     this.startTime = 0;
     this.pauseTime = 0;
+    this.lastVolume = 1;
     this.isPlaying = false;
   }
 
@@ -94,6 +96,16 @@ export class AudioController {
       this.isPlaying = false;
     }
   }
+
+  mute(): void {
+    if (this.gainNode.gain.value > 0) {
+      this.lastVolume = this.gainNode.gain.value;
+      this.gainNode.gain.value = 0;
+    } else {
+      this.gainNode.gain.value = this.lastVolume;
+    }
+  }
+
   setVolume(volume: number): void {
     this.gainNode.gain.value = volume;
   }
