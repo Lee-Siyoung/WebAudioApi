@@ -3,6 +3,10 @@
     <button @click="play">Play</button>
     <button @click="pause">Pause</button>
     <button @click="stop">Stop</button>
+
+    <button @click="toggleCompression">
+      압축 {{ state.isCompressionActive }}
+    </button>
     <div>
       <label for="volumeControl">볼륨</label>
       <input
@@ -45,6 +49,7 @@ export default defineComponent({
       updateVolume,
       updatePlaybackRate,
       getAnalyser,
+      toggleCompression,
     } = useAudio("../assets/test.mp3");
     const { startVisualization } = useAudioVisualizer(getAnalyser(), canvas);
 
@@ -62,6 +67,7 @@ export default defineComponent({
       updateVolume,
       updatePlaybackRate,
       canvas,
+      toggleCompression,
     };
   },
 });

@@ -7,6 +7,7 @@ export function useAudio(url: string) {
     isLoaded: false,
     volume: 1,
     playbackRate: 1,
+    isCompressionActive: false,
   });
 
   audioController.loadAudio(url).then(() => {
@@ -41,6 +42,11 @@ export function useAudio(url: string) {
     return audioController.getAnalyser();
   };
 
+  const toggleCompression = () => {
+    audioController.toggleCompression();
+    state.isCompressionActive = !state.isCompressionActive;
+  };
+
   return {
     play,
     pause,
@@ -49,5 +55,6 @@ export function useAudio(url: string) {
     updateVolume,
     updatePlaybackRate,
     getAnalyser,
+    toggleCompression,
   };
 }
