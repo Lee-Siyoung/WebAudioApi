@@ -13,9 +13,9 @@
         type="range"
         min="0"
         :max="state.totalTime"
-        step="1"
+        step="0.1"
         v-model="state.currentTime"
-        @input="setCurrentTime(state.currentTime)"
+        @input="handleTimeChange"
       />
       <p>{{ formatCurrentTime }} / {{ formatTotalTime }}</p>
     </div>
@@ -47,7 +47,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, ref } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import { useAudio } from "@/utils/useAudio";
 import { useAudioVisualizer } from "./utils/useAudioVisualizer";
 import { formatTime } from "@/utils/FormatTime";
@@ -65,10 +65,16 @@ export default defineComponent({
       getAnalyser,
       Compression,
       setCurrentTime,
-    } = useAudio("../assets/video30s.mp4");
+    } = useAudio("../assets/test.mp3");
     const { startVisualization } = useAudioVisualizer(getAnalyser(), canvas);
     const formatCurrentTime = computed(() => formatTime(state.currentTime));
     const formatTotalTime = computed(() => formatTime(state.totalTime));
+
+    const handleTimeChange = (event: Event) => {
+      const target = event.target as HTMLInputElement;
+      const newTime = parseFloat(target.value);
+      setCurrentTime(newTime);
+    };
     onMounted(() => {
       if (canvas.value) {
         startVisualization();
@@ -86,6 +92,7 @@ export default defineComponent({
       canvas,
       Compression,
       setCurrentTime,
+      handleTimeChange,
       formatCurrentTime,
       formatTotalTime,
     };

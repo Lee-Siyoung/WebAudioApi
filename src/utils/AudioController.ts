@@ -78,8 +78,11 @@ export class AudioController {
 
   play(): void {
     if (this.audioBuffer) {
-      if (this.isPlaying) {
+      if (!this.audioBuffer) {
         return;
+      }
+      if (this.isPlaying && this.sourceNode) {
+        this.pause();
       }
       this.sourceNode = this.audioContext.createBufferSource();
       this.sourceNode.buffer = this.audioBuffer;
@@ -134,11 +137,13 @@ export class AudioController {
   }
 
   setCurrentTime(time: number): void {
-    if (this.audioBuffer) {
-      this.pauseTime = time;
-      if (this.isPlaying) {
-        this.play(); // 현재 재생 중이면 재생을 재시작
+    const wasPlaying = this.isPlaying;
+    this.pauseTime = time;
+    if (wasPlaying) {
+      if (this.sourceNode) {
+        this.sourceNode.stop();
       }
+      this.play();
     }
   }
 
