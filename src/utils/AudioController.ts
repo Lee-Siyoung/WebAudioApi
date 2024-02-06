@@ -90,7 +90,7 @@ export class AudioController {
   }
 
   stop(): void {
-    if (this.isPlaying && this.sourceNode) {
+    if (this.sourceNode) {
       this.sourceNode.stop();
       this.pauseTime = 0;
       this.isPlaying = false;

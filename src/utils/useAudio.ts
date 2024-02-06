@@ -4,9 +4,9 @@ import { AudioController } from "./AudioController";
 export function useAudio(url: string) {
   const audioController = new AudioController();
   const state = reactive({
-    isLoaded: false,
     volume: 1,
     playbackRate: 1,
+    isLoaded: false,
     isCompressionActive: false,
     isMute: false,
   });
