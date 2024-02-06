@@ -9,11 +9,13 @@ export class AudioController {
   private pauseTime: number;
   private lastVolume: number;
   private totalDuration: number;
+  private playbackRate: number;
   private isPlaying: boolean;
   private isCompressionActive: boolean;
 
   constructor() {
     this.totalDuration = 0;
+    this.playbackRate = 1;
     this.audioContext = new AudioContext();
     this.gainNode = this.audioContext.createGain();
     this.compressor = this.audioContext.createDynamicsCompressor();
@@ -117,13 +119,16 @@ export class AudioController {
     this.gainNode.gain.value = volume;
   }
   setPlaybackRate(rate: number): void {
+    this.playbackRate = rate;
     if (this.sourceNode) {
       this.sourceNode.playbackRate.value = rate;
     }
   }
   getCurrentTime(): number {
     if (this.isPlaying && this.sourceNode && this.audioContext) {
-      return this.audioContext.currentTime - this.startTime + this.pauseTime;
+      const elapsedTime =
+        (this.audioContext.currentTime - this.startTime) * this.playbackRate;
+      return this.pauseTime + elapsedTime;
     }
     return this.pauseTime;
   }

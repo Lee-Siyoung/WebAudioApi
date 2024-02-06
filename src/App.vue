@@ -65,7 +65,7 @@ export default defineComponent({
       getAnalyser,
       Compression,
       setCurrentTime,
-    } = useAudio("../assets/test.mp3");
+    } = useAudio("../assets/video30s.mp4");
     const { startVisualization } = useAudioVisualizer(getAnalyser(), canvas);
     const formatCurrentTime = computed(() => formatTime(state.currentTime));
     const formatTotalTime = computed(() => formatTime(state.totalTime));
