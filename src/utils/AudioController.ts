@@ -44,7 +44,7 @@ export class AudioController {
     return this.analyser;
   }
 
-  toggleCompression() {
+  Compression() {
     if (this.isCompressionActive) {
       // 압축 비활성화
       this.gainNode.disconnect();

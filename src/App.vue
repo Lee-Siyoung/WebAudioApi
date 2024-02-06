@@ -3,10 +3,10 @@
     <button @click="play">Play</button>
     <button @click="pause">Pause</button>
     <button @click="stop">Stop</button>
-    <button @click="mute">Mute</button>
+    <button @click="mute">{{ state.isMute ? "음소거해제" : "음소거" }}</button>
 
-    <button @click="toggleCompression">
-      압축 {{ state.isCompressionActive }}
+    <button @click="Compression">
+      {{ state.isCompressionActive ? "압축" : "압축품" }}
     </button>
     <div>
       <label for="volumeControl">볼륨</label>
@@ -17,6 +17,7 @@
         step="0.1"
         v-model="state.volume"
         @input="updateVolume(state.volume)"
+        :disabled="state.isMute"
       />
       <p>Volume: {{ state.volume }}</p>
       <label for="playbackRate">재생 속도</label>
@@ -51,7 +52,7 @@ export default defineComponent({
       updateVolume,
       updatePlaybackRate,
       getAnalyser,
-      toggleCompression,
+      Compression,
     } = useAudio("../assets/test.mp3");
     const { startVisualization } = useAudioVisualizer(getAnalyser(), canvas);
 
@@ -70,7 +71,7 @@ export default defineComponent({
       updateVolume,
       updatePlaybackRate,
       canvas,
-      toggleCompression,
+      Compression,
     };
   },
 });

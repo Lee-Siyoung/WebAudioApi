@@ -8,6 +8,7 @@ export function useAudio(url: string) {
     volume: 1,
     playbackRate: 1,
     isCompressionActive: false,
+    isMute: false,
   });
 
   audioController.loadAudio(url).then(() => {
@@ -30,6 +31,7 @@ export function useAudio(url: string) {
 
   const mute = () => {
     audioController.mute();
+    state.isMute = !state.isMute;
   };
 
   const updateVolume = (newVolume: number) => {
@@ -46,8 +48,8 @@ export function useAudio(url: string) {
     return audioController.getAnalyser();
   };
 
-  const toggleCompression = () => {
-    audioController.toggleCompression();
+  const Compression = () => {
+    audioController.Compression();
     state.isCompressionActive = !state.isCompressionActive;
   };
 
@@ -60,6 +62,6 @@ export function useAudio(url: string) {
     updateVolume,
     updatePlaybackRate,
     getAnalyser,
-    toggleCompression,
+    Compression,
   };
 }
