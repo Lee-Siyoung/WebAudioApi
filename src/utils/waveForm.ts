@@ -25,25 +25,19 @@ export const waveForm = (
 
     ctx.fillStyle = "white";
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
-    ctx.strokeStyle = "black";
     ctx.beginPath();
 
     for (let i = 0; i < WIDTH; i++) {
       let min = 1.0;
       let max = -1.0;
       for (let j = 0; j < step; j++) {
-        const value = data[i * step + j];
-        if (value < min) min = value;
-        if (value > max) max = value;
+        const datum = data[i * step + j];
+        if (datum < min) min = datum;
+        if (datum > max) max = datum;
       }
-      const yLow = (min + 1) * amp;
-      const yHigh = (max + 1) * amp;
-
-      ctx.moveTo(i, yLow);
-      ctx.lineTo(i, yHigh);
+      ctx.fillRect(i, (1 + min) * amp, 1, Math.max(1, (max - min) * amp));
+      ctx.fillStyle = "#38f";
     }
-    ctx.strokeStyle = "#38f";
-    ctx.stroke();
     timeLine(currentTime); // 시간 선
     animationFrameId = requestAnimationFrame(draw);
   };

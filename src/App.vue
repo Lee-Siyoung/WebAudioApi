@@ -46,7 +46,7 @@
     </div>
     <canvas ref="canvas" width="400" height="200"></canvas>
     <div>
-      <canvas ref="waveform" width="800" height="200"></canvas>
+      <canvas ref="waveform" width="1000" height="100"></canvas>
     </div>
   </div>
 </template>
@@ -75,7 +75,7 @@ export default defineComponent({
       getAudioBuffer,
       Compression,
       setCurrentTime,
-    } = useAudio("../assets/video30s.mp4", audioController);
+    } = useAudio("../assets/test.mp3", audioController);
     const { startVisualization } = useAudioVisualizer(getAnalyser(), canvas);
     const formatCurrentTime = computed(() => formatTime(state.currentTime));
     const formatTotalTime = computed(() => formatTime(state.totalTime));

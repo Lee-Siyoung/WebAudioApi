@@ -28,7 +28,7 @@ export const useAudioVisualizer = (
 
     for (let i = 0; i < bufferLength; i++) {
       const v = dataArray[i] / 128.0;
-      const y = (v * HEIGHT) / 2;
+      const y = (v * HEIGHT) / 4;
 
       if (i === 0) {
         ctx.moveTo(x, y);
@@ -39,7 +39,7 @@ export const useAudioVisualizer = (
       x += sliceWidth;
     }
 
-    ctx.lineTo(WIDTH, HEIGHT / 2);
+    ctx.lineTo(WIDTH, HEIGHT / 4);
     ctx.stroke();
 
     analyser.getByteFrequencyData(dataArray);
