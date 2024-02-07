@@ -45,17 +45,22 @@
       <p>PlayRate: {{ state.playbackRate }}</p>
     </div>
     <canvas ref="canvas" width="400" height="200"></canvas>
+    <div>
+      <canvas ref="waveform" width="800" height="200"></canvas>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, ref } from "vue";
+import { computed, defineComponent, onMounted, ref, watch } from "vue";
 import { useAudio } from "@/utils/useAudio";
 import { useAudioVisualizer } from "./utils/useAudioVisualizer";
+import { waveForm } from "./utils/waveForm";
 import { formatTime } from "@/utils/FormatTime";
 export default defineComponent({
   setup() {
     const canvas = ref<HTMLCanvasElement | null>(null);
+    const waveform = ref<HTMLCanvasElement | null>(null);
     const {
       play,
       pause,
@@ -65,9 +70,10 @@ export default defineComponent({
       updateVolume,
       updatePlaybackRate,
       getAnalyser,
+      getAudioBuffer,
       Compression,
       setCurrentTime,
-    } = useAudio("../assets/test.mp3");
+    } = useAudio("../assets/video30s.mp4");
     const { startVisualization } = useAudioVisualizer(getAnalyser(), canvas);
     const formatCurrentTime = computed(() => formatTime(state.currentTime));
     const formatTotalTime = computed(() => formatTime(state.totalTime));
@@ -78,9 +84,20 @@ export default defineComponent({
       setCurrentTime(newTime);
     };
     onMounted(() => {
-      if (canvas.value) {
-        startVisualization();
-      }
+      watch(
+        () => state.isLoaded,
+        (isLoaded) => {
+          if (isLoaded) {
+            if (canvas.value) {
+              startVisualization();
+            }
+            const audioBuffer = getAudioBuffer();
+            if (waveform.value && audioBuffer) {
+              waveForm(audioBuffer, waveform.value);
+            }
+          }
+        }
+      );
     });
 
     return {
@@ -92,6 +109,7 @@ export default defineComponent({
       updateVolume,
       updatePlaybackRate,
       canvas,
+      waveform,
       Compression,
       setCurrentTime,
       handleTimeChange,

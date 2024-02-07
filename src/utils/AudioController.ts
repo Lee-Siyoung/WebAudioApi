@@ -44,6 +44,10 @@ export class AudioController {
     this.isPlaying = false;
   }
 
+  getAudioBuffer(): AudioBuffer | undefined {
+    return this.audioBuffer;
+  }
+
   getAnalyser(): AnalyserNode {
     return this.analyser;
   }
