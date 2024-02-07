@@ -1,33 +1,58 @@
 import { AudioController } from "./AudioController";
+import { formatTime } from "./FormatTime";
 export const waveForm = (
   audioController: AudioController,
   audioBuffer: AudioBuffer,
-  waveFromRef: HTMLCanvasElement
+  waveFromRef: HTMLCanvasElement,
+  timeScaleRef: HTMLCanvasElement
 ) => {
-  if (!waveFromRef) return;
-  const canvas = waveFromRef;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return;
+  if (!waveFromRef || !timeScaleRef) return;
+  const ctx = waveFromRef.getContext("2d");
+  const timeCtx = timeScaleRef.getContext("2d");
+  if (!ctx || !timeCtx) return;
 
-  let animationFrameId: number;
-  const WIDTH = canvas.width;
-  const HEIGHT = canvas.height;
   const data = audioBuffer.getChannelData(0);
   const bufferLength = data.length;
   const duration = audioBuffer.duration;
 
+  const timeScaleInterval = 5;
+  const totalMarkers = Math.floor(duration / timeScaleInterval);
+  const pixelPerSecond = 20;
+  const totalWidth = Math.max(
+    waveFromRef.clientWidth,
+    pixelPerSecond *
+      (totalMarkers * timeScaleInterval + (duration % timeScaleInterval))
+  );
+
+  waveFromRef.width = timeScaleRef.width = totalWidth;
+
+  const drawTimeScale = () => {
+    timeCtx.clearRect(0, 0, timeScaleRef.width, timeScaleRef.height);
+    timeCtx.fillStyle = "black";
+    timeCtx.font = "12px Arial";
+    timeCtx.textAlign = "center";
+    for (let i = 0; i <= totalMarkers; i++) {
+      const marketTime = timeScaleInterval * i;
+      const x = pixelPerSecond * marketTime;
+      timeCtx.fillText(formatTime(marketTime), x, 10);
+    }
+    const lastMarkerX = pixelPerSecond * duration;
+    timeCtx.textAlign = "end";
+    timeCtx.fillText(formatTime(duration), lastMarkerX, 10);
+  };
+
   const draw = () => {
-    const step = Math.ceil(bufferLength / WIDTH);
-    const amp = HEIGHT / 2;
+    const step = Math.ceil(bufferLength / waveFromRef.width);
+    const amp = waveFromRef.height / 2;
     const currentTime = audioController.getCurrentTime();
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, waveFromRef.width, waveFromRef.height);
 
     ctx.fillStyle = "white";
-    ctx.fillRect(0, 0, WIDTH, HEIGHT);
+    ctx.fillRect(0, 0, waveFromRef.width, waveFromRef.height);
     ctx.beginPath();
 
-    for (let i = 0; i < WIDTH; i++) {
+    for (let i = 0; i < waveFromRef.width; i++) {
       let min = 1.0;
       let max = -1.0;
       for (let j = 0; j < step; j++) {
@@ -39,18 +64,18 @@ export const waveForm = (
       ctx.fillStyle = "#38f";
     }
     timeLine(currentTime); // 시간 선
-    animationFrameId = requestAnimationFrame(draw);
+    requestAnimationFrame(draw);
   };
 
   const timeLine = (currentTime: number) => {
-    const x = (currentTime / duration) * WIDTH;
+    const x = (currentTime / duration) * timeScaleRef.width;
     ctx.strokeStyle = "red";
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(x, 0);
-    ctx.lineTo(x, HEIGHT);
+    ctx.lineTo(x, timeScaleRef.height);
     ctx.stroke();
   };
-
+  drawTimeScale();
   draw();
 };

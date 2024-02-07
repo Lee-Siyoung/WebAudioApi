@@ -45,8 +45,9 @@
       <p>PlayRate: {{ state.playbackRate }}</p>
     </div>
     <canvas ref="canvas" width="400" height="200"></canvas>
-    <div>
-      <canvas ref="waveform" width="1000" height="100"></canvas>
+    <div id="waveform-container" style="width: 100%; overflow-x: auto">
+      <canvas ref="timeScale"></canvas>
+      <canvas ref="waveform"></canvas>
     </div>
   </div>
 </template>
@@ -62,6 +63,7 @@ export default defineComponent({
   setup() {
     const canvas = ref<HTMLCanvasElement | null>(null);
     const waveform = ref<HTMLCanvasElement | null>(null);
+    const timeScale = ref<HTMLCanvasElement | null>(null);
     const audioController = new AudioController();
     const {
       play,
@@ -75,7 +77,7 @@ export default defineComponent({
       getAudioBuffer,
       Compression,
       setCurrentTime,
-    } = useAudio("../assets/test.mp3", audioController);
+    } = useAudio("../assets/video30s.mp4", audioController);
     const { startVisualization } = useAudioVisualizer(getAnalyser(), canvas);
     const formatCurrentTime = computed(() => formatTime(state.currentTime));
     const formatTotalTime = computed(() => formatTime(state.totalTime));
@@ -93,8 +95,13 @@ export default defineComponent({
               startVisualization();
             }
             const audioBuffer = getAudioBuffer();
-            if (waveform.value && audioBuffer) {
-              waveForm(audioController, audioBuffer, waveform.value);
+            if (waveform.value && timeScale.value && audioBuffer) {
+              waveForm(
+                audioController,
+                audioBuffer,
+                waveform.value,
+                timeScale.value
+              );
             }
           }
         }
@@ -111,6 +118,7 @@ export default defineComponent({
       updatePlaybackRate,
       canvas,
       waveform,
+      timeScale,
       Compression,
       setCurrentTime,
       handleTimeChange,
@@ -121,4 +129,8 @@ export default defineComponent({
 });
 </script>
 
-<style></style>
+<style>
+canvas {
+  display: block;
+}
+</style>
