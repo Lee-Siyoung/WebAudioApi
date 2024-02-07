@@ -1,8 +1,7 @@
 import { reactive } from "vue";
 import { AudioController } from "./AudioController";
 
-export function useAudio(url: string) {
-  const audioController = new AudioController();
+export function useAudio(url: string, audioController: AudioController) {
   const state = reactive({
     volume: 1,
     playbackRate: 1,

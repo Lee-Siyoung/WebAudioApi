@@ -57,10 +57,12 @@ import { useAudio } from "@/utils/useAudio";
 import { useAudioVisualizer } from "./utils/useAudioVisualizer";
 import { waveForm } from "./utils/waveForm";
 import { formatTime } from "@/utils/FormatTime";
+import { AudioController } from "./utils/AudioController";
 export default defineComponent({
   setup() {
     const canvas = ref<HTMLCanvasElement | null>(null);
     const waveform = ref<HTMLCanvasElement | null>(null);
+    const audioController = new AudioController();
     const {
       play,
       pause,
@@ -73,11 +75,10 @@ export default defineComponent({
       getAudioBuffer,
       Compression,
       setCurrentTime,
-    } = useAudio("../assets/video30s.mp4");
+    } = useAudio("../assets/video30s.mp4", audioController);
     const { startVisualization } = useAudioVisualizer(getAnalyser(), canvas);
     const formatCurrentTime = computed(() => formatTime(state.currentTime));
     const formatTotalTime = computed(() => formatTime(state.totalTime));
-
     const handleTimeChange = (event: Event) => {
       const target = event.target as HTMLInputElement;
       const newTime = parseFloat(target.value);
@@ -93,7 +94,7 @@ export default defineComponent({
             }
             const audioBuffer = getAudioBuffer();
             if (waveform.value && audioBuffer) {
-              waveForm(audioBuffer, waveform.value);
+              waveForm(audioController, audioBuffer, waveform.value);
             }
           }
         }
