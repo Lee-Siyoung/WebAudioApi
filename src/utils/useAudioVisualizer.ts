@@ -1,4 +1,4 @@
-import { Ref, onMounted, ref } from "vue";
+import { Ref, ref } from "vue";
 
 export const useAudioVisualizer = (
   analyser: AnalyserNode,
@@ -66,10 +66,6 @@ export const useAudioVisualizer = (
       cancelAnimationFrame(animationId.value);
     }
   };
-
-  onMounted(() => {
-    stopVisualization();
-  });
 
   return { startVisualization, stopVisualization };
 };

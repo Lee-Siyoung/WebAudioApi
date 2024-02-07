@@ -1,7 +1,7 @@
 <template>
   <div>
-    <button @click="play">Play</button>
-    <button @click="pause">Pause</button>
+    <button @click="handlePlay">Play</button>
+    <button @click="handlePause">Pause</button>
     <button @click="stop">Stop</button>
     <button @click="mute">
       {{ state.isMute ? "음소거 중" : "음소거 안함" }}
@@ -77,23 +77,34 @@ export default defineComponent({
       getAudioBuffer,
       Compression,
       setCurrentTime,
-    } = useAudio("../assets/video30s.mp4", audioController);
-    const { startVisualization } = useAudioVisualizer(getAnalyser(), canvas);
+    } = useAudio("../assets/test.mp3", audioController);
+    const { startVisualization, stopVisualization } = useAudioVisualizer(
+      getAnalyser(),
+      canvas
+    );
     const formatCurrentTime = computed(() => formatTime(state.currentTime));
     const formatTotalTime = computed(() => formatTime(state.totalTime));
+
     const handleTimeChange = (event: Event) => {
       const target = event.target as HTMLInputElement;
       const newTime = parseFloat(target.value);
       setCurrentTime(newTime);
     };
+
+    const handlePlay = () => {
+      play();
+      startVisualization();
+    };
+    const handlePause = () => {
+      pause();
+      stopVisualization();
+    };
+
     onMounted(() => {
       watch(
         () => state.isLoaded,
         (isLoaded) => {
           if (isLoaded) {
-            if (canvas.value) {
-              startVisualization();
-            }
             const audioBuffer = getAudioBuffer();
             if (waveform.value && timeScale.value && audioBuffer) {
               waveForm(
@@ -124,6 +135,8 @@ export default defineComponent({
       handleTimeChange,
       formatCurrentTime,
       formatTotalTime,
+      handlePause,
+      handlePlay,
     };
   },
 });

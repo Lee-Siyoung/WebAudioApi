@@ -10,7 +10,7 @@ export class AudioController {
   private lastVolume: number;
   private totalDuration: number;
   private playbackRate: number;
-  private isPlaying: boolean;
+  public isPlaying: boolean;
   private isCompressionActive: boolean;
 
   constructor() {
