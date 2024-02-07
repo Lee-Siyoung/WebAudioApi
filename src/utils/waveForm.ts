@@ -68,12 +68,12 @@ export const waveForm = (
   };
 
   const timeLine = (currentTime: number) => {
-    const x = (currentTime / duration) * timeScaleRef.width;
+    const x = (currentTime / duration) * waveFromRef.width;
     ctx.strokeStyle = "red";
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(x, 0);
-    ctx.lineTo(x, timeScaleRef.height);
+    ctx.lineTo(x, waveFromRef.height);
     ctx.stroke();
   };
   drawTimeScale();

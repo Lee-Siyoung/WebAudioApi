@@ -46,7 +46,7 @@
     </div>
     <canvas ref="canvas" width="400" height="200"></canvas>
     <div id="waveform-container" style="width: 100%; overflow-x: auto">
-      <canvas ref="timeScale"></canvas>
+      <canvas ref="timeScale" height="20"></canvas>
       <canvas ref="waveform"></canvas>
     </div>
   </div>
