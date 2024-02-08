@@ -1,6 +1,5 @@
 import { AudioController } from "./AudioController";
 import { formatTime } from "./FormatTime";
-import { ref } from "vue";
 export const waveForm = (
   audioController: AudioController,
   audioBuffer: AudioBuffer,
@@ -11,7 +10,6 @@ export const waveForm = (
   const ctx = waveFromRef.getContext("2d");
   const timeCtx = timeScaleRef.getContext("2d");
   if (!ctx || !timeCtx) return;
-  const animationId = ref<number | null>(null);
 
   const data = audioBuffer.getChannelData(0);
   const bufferLength = data.length;
@@ -66,7 +64,7 @@ export const waveForm = (
       ctx.fillStyle = "#38f";
     }
     timeLine(currentTime); // 시간 선
-    animationId.value = requestAnimationFrame(draw);
+    requestAnimationFrame(draw);
   };
 
   const timeLine = (currentTime: number) => {

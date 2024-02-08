@@ -2,12 +2,11 @@ import { Ref, ref } from "vue";
 
 export const useAudioVisualizer = (
   analyser: AnalyserNode,
-  canvasRef: Ref<HTMLCanvasElement | null>
+  canvasRef: HTMLCanvasElement
 ) => {
-  const animationId = ref<number | null>(null);
   const draw = () => {
-    if (!canvasRef.value) return;
-    const canvas = canvasRef.value;
+    if (!canvasRef) return;
+    const canvas = canvasRef;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
@@ -53,19 +52,7 @@ export const useAudioVisualizer = (
       ctx.fillRect(z, HEIGHT - barHeight / 2, barWidth, barHeight / 2);
       z += barWidth + 1;
     }
-
-    animationId.value = requestAnimationFrame(draw);
+    requestAnimationFrame(draw);
   };
-
-  const startVisualization = () => {
-    draw();
-  };
-
-  const stopVisualization = () => {
-    if (animationId.value) {
-      cancelAnimationFrame(animationId.value);
-    }
-  };
-
-  return { startVisualization, stopVisualization };
+  draw();
 };

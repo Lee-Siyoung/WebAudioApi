@@ -78,10 +78,6 @@ export default defineComponent({
       Compression,
       setCurrentTime,
     } = useAudio("../assets/test.mp3", audioController);
-    const { startVisualization, stopVisualization } = useAudioVisualizer(
-      getAnalyser(),
-      canvas
-    );
     const formatCurrentTime = computed(() => formatTime(state.currentTime));
     const formatTotalTime = computed(() => formatTime(state.totalTime));
 
@@ -93,31 +89,33 @@ export default defineComponent({
 
     const handlePlay = () => {
       play();
-      startVisualization();
     };
     const handlePause = () => {
       pause();
-      stopVisualization();
     };
 
-    onMounted(() => {
-      watch(
-        () => state.isLoaded,
-        (isLoaded) => {
-          if (isLoaded) {
-            const audioBuffer = getAudioBuffer();
-            if (waveform.value && timeScale.value && audioBuffer) {
-              waveForm(
-                audioController,
-                audioBuffer,
-                waveform.value,
-                timeScale.value
-              );
-            }
+    watch(
+      () => state.isLoaded,
+      (isLoaded) => {
+        if (isLoaded) {
+          const audioBuffer = getAudioBuffer();
+          if (
+            canvas.value &&
+            waveform.value &&
+            timeScale.value &&
+            audioBuffer
+          ) {
+            useAudioVisualizer(getAnalyser(), canvas.value);
+            waveForm(
+              audioController,
+              audioBuffer,
+              waveform.value,
+              timeScale.value
+            );
           }
         }
-      );
-    });
+      }
+    );
 
     return {
       play,
