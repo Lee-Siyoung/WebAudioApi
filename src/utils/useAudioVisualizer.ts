@@ -1,7 +1,7 @@
-import { Ref, ref } from "vue";
-
+import { ref } from "vue";
+import { AudioController } from "./AudioController";
 export const useAudioVisualizer = (
-  analyser: AnalyserNode,
+  audioController: AudioController,
   canvasRef: HTMLCanvasElement
 ) => {
   const draw = () => {
@@ -9,7 +9,8 @@ export const useAudioVisualizer = (
     const canvas = canvasRef;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-
+    const analyser = audioController.getAnalyser();
+    const animationId = ref<number | null>(null);
     const WIDTH = canvas.width;
     const HEIGHT = canvas.height;
     ctx.clearRect(0, 0, WIDTH, HEIGHT);
@@ -52,7 +53,7 @@ export const useAudioVisualizer = (
       ctx.fillRect(z, HEIGHT - barHeight / 2, barWidth, barHeight / 2);
       z += barWidth + 1;
     }
-    requestAnimationFrame(draw);
+    animationId.value = requestAnimationFrame(draw);
   };
   draw();
 };

@@ -82,9 +82,6 @@ export class AudioController {
 
   play(): void {
     if (this.audioBuffer) {
-      if (!this.audioBuffer) {
-        return;
-      }
       if (this.isPlaying && this.sourceNode) {
         this.pause();
       }

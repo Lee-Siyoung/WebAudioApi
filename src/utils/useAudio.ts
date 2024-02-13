@@ -54,14 +54,6 @@ export function useAudio(url: string, audioController: AudioController) {
     audioController.setPlaybackRate(state.playbackRate);
   };
 
-  const getAnalyser = () => {
-    return audioController.getAnalyser();
-  };
-
-  const getAudioBuffer = () => {
-    return audioController.getAudioBuffer();
-  };
-
   const Compression = () => {
     audioController.Compression();
     state.isCompressionActive = !state.isCompressionActive;
@@ -75,9 +67,7 @@ export function useAudio(url: string, audioController: AudioController) {
     state,
     updateVolume,
     updatePlaybackRate,
-    getAnalyser,
     Compression,
-    getAudioBuffer,
     setCurrentTime,
   };
 }

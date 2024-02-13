@@ -1,16 +1,17 @@
+import { ref } from "vue";
 import { AudioController } from "./AudioController";
 import { formatTime } from "./FormatTime";
 export const waveForm = (
   audioController: AudioController,
-  audioBuffer: AudioBuffer,
   waveFromRef: HTMLCanvasElement,
   timeScaleRef: HTMLCanvasElement
 ) => {
   if (!waveFromRef || !timeScaleRef) return;
   const ctx = waveFromRef.getContext("2d");
   const timeCtx = timeScaleRef.getContext("2d");
-  if (!ctx || !timeCtx) return;
-
+  const audioBuffer = audioController.getAudioBuffer();
+  if (!ctx || !timeCtx || !audioBuffer) return;
+  const animationId = ref<number | null>(null);
   const data = audioBuffer.getChannelData(0);
   const bufferLength = data.length;
   const duration = audioBuffer.duration;
@@ -63,8 +64,10 @@ export const waveForm = (
       ctx.fillRect(i, (1 + min) * amp, 1, Math.max(1, (max - min) * amp));
       ctx.fillStyle = "#38f";
     }
+    drawTimeScale();
     timeLine(currentTime); // 시간 선
-    requestAnimationFrame(draw);
+
+    animationId.value = requestAnimationFrame(draw);
   };
 
   const timeLine = (currentTime: number) => {
@@ -76,6 +79,6 @@ export const waveForm = (
     ctx.lineTo(x, waveFromRef.height);
     ctx.stroke();
   };
-  drawTimeScale();
+
   draw();
 };

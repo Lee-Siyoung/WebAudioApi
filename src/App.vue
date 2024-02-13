@@ -53,7 +53,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, ref, watch } from "vue";
+import { computed, defineComponent, ref, watch } from "vue";
 import { useAudio } from "@/utils/useAudio";
 import { useAudioVisualizer } from "./utils/useAudioVisualizer";
 import { waveForm } from "./utils/waveForm";
@@ -73,8 +73,6 @@ export default defineComponent({
       state,
       updateVolume,
       updatePlaybackRate,
-      getAnalyser,
-      getAudioBuffer,
       Compression,
       setCurrentTime,
     } = useAudio("../assets/test.mp3", audioController);
@@ -98,20 +96,9 @@ export default defineComponent({
       () => state.isLoaded,
       (isLoaded) => {
         if (isLoaded) {
-          const audioBuffer = getAudioBuffer();
-          if (
-            canvas.value &&
-            waveform.value &&
-            timeScale.value &&
-            audioBuffer
-          ) {
-            useAudioVisualizer(getAnalyser(), canvas.value);
-            waveForm(
-              audioController,
-              audioBuffer,
-              waveform.value,
-              timeScale.value
-            );
+          if (canvas.value && waveform.value && timeScale.value) {
+            useAudioVisualizer(audioController, canvas.value);
+            waveForm(audioController, waveform.value, timeScale.value);
           }
         }
       }
