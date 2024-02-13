@@ -1,16 +1,17 @@
-import { ref } from "vue";
+import { ref, Ref } from "vue";
 import { AudioController } from "./AudioController";
 export const useAudioVisualizer = (
   audioController: AudioController,
-  canvasRef: HTMLCanvasElement
+  canvasRef: Ref<HTMLCanvasElement | null>
 ) => {
+  const animationId = ref<number | null>(null);
   const draw = () => {
-    if (!canvasRef) return;
-    const canvas = canvasRef;
+    if (!canvasRef.value) return;
+    const canvas = canvasRef.value;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     const analyser = audioController.getAnalyser();
-    const animationId = ref<number | null>(null);
+
     const WIDTH = canvas.width;
     const HEIGHT = canvas.height;
     ctx.clearRect(0, 0, WIDTH, HEIGHT);
@@ -54,6 +55,20 @@ export const useAudioVisualizer = (
       z += barWidth + 1;
     }
     animationId.value = requestAnimationFrame(draw);
+    console.log(animationId.value);
   };
-  draw();
+
+  const startVisualize = () => {
+    if (animationId.value !== null) {
+      cancelAnimationFrame(animationId.value);
+    }
+    draw();
+  };
+  const pauseVisualize = () => {
+    if (animationId.value !== null) {
+      cancelAnimationFrame(animationId.value);
+    }
+  };
+
+  return { startVisualize, pauseVisualize };
 };

@@ -2,7 +2,7 @@
   <div>
     <button @click="handlePlay">Play</button>
     <button @click="handlePause">Pause</button>
-    <button @click="stop">Stop</button>
+    <button @click="handleStop">Stop</button>
     <button @click="mute">
       {{ state.isMute ? "음소거 중" : "음소거 안함" }}
     </button>
@@ -79,6 +79,15 @@ export default defineComponent({
     const formatCurrentTime = computed(() => formatTime(state.currentTime));
     const formatTotalTime = computed(() => formatTime(state.totalTime));
 
+    const { startVisualize, pauseVisualize } = useAudioVisualizer(
+      audioController,
+      canvas
+    );
+    const { startWave, pauseWave } = waveForm(
+      audioController,
+      waveform,
+      timeScale
+    );
     const handleTimeChange = (event: Event) => {
       const target = event.target as HTMLInputElement;
       const newTime = parseFloat(target.value);
@@ -87,19 +96,37 @@ export default defineComponent({
 
     const handlePlay = () => {
       play();
+      startVisualize();
+      startWave();
     };
     const handlePause = () => {
       pause();
+      pauseVisualize();
+      pauseWave();
     };
+    const handleStop = () => {
+      stop();
+      startVisualize();
+      startWave();
+      pauseVisualize();
+      pauseWave();
+    };
+
+    // onMounted(() => {
+    //   if (canvas.value && waveform.value && timeScale.value) {
+    //     stopVisualize();
+    //     stopWave();
+    //   }
+    // });
 
     watch(
       () => state.isLoaded,
       (isLoaded) => {
         if (isLoaded) {
-          if (canvas.value && waveform.value && timeScale.value) {
-            useAudioVisualizer(audioController, canvas.value);
-            waveForm(audioController, waveform.value, timeScale.value);
-          }
+          startVisualize();
+          startWave();
+          pauseVisualize();
+          pauseWave();
         }
       }
     );
@@ -122,6 +149,7 @@ export default defineComponent({
       formatTotalTime,
       handlePause,
       handlePlay,
+      handleStop,
     };
   },
 });
