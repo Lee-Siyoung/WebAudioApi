@@ -55,7 +55,6 @@ export const useAudioVisualizer = (
       z += barWidth + 1;
     }
     animationId.value = requestAnimationFrame(draw);
-    console.log(animationId.value);
   };
 
   const startVisualize = () => {

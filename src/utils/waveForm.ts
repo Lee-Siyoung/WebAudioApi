@@ -72,12 +72,7 @@ export const waveForm = (
       const x = pixelPerSecond * marketTime;
       timeCtx.fillText(formatTime(marketTime), x, 10);
     }
-    // const lastMarkerX = pixelPerSecond * duration;
-    // timeCtx.textAlign = "end";
-    // timeCtx.fillText(formatTime(duration), lastMarkerX, 10);
-
     animationId.value = requestAnimationFrame(draw);
-    console.log(animationId.value);
   };
 
   const startWave = () => {

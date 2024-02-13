@@ -112,13 +112,6 @@ export default defineComponent({
       pauseWave();
     };
 
-    // onMounted(() => {
-    //   if (canvas.value && waveform.value && timeScale.value) {
-    //     stopVisualize();
-    //     stopWave();
-    //   }
-    // });
-
     watch(
       () => state.isLoaded,
       (isLoaded) => {
@@ -132,9 +125,6 @@ export default defineComponent({
     );
 
     return {
-      play,
-      pause,
-      stop,
       mute,
       state,
       updateVolume,

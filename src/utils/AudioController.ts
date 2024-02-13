@@ -14,8 +14,6 @@ export class AudioController {
   private isCompressionActive: boolean;
 
   constructor() {
-    this.totalDuration = 0;
-    this.playbackRate = 1;
     this.audioContext = new AudioContext();
     this.gainNode = this.audioContext.createGain();
     this.compressor = this.audioContext.createDynamicsCompressor();
@@ -26,11 +24,11 @@ export class AudioController {
     this.compressor.threshold.setValueAtTime(
       -50,
       this.audioContext.currentTime
-    );
-    this.compressor.knee.setValueAtTime(40, this.audioContext.currentTime);
-    this.compressor.ratio.setValueAtTime(12, this.audioContext.currentTime);
-    this.compressor.attack.setValueAtTime(0, this.audioContext.currentTime);
-    this.compressor.release.setValueAtTime(0.25, this.audioContext.currentTime);
+    ); // 압축이 적용되기 시작하는 데시벨 값을 나타내는 k-rate
+    this.compressor.knee.setValueAtTime(40, this.audioContext.currentTime); // 곡선이 압축된 부분으로 원활하게 전환되는 임계값 위의 범위를 나타내는 데시벨 값이 포함된 k-rate
+    this.compressor.ratio.setValueAtTime(12, this.audioContext.currentTime); // 출력이 1dB 변경되는 데 필요한 입력에 필요한 변경량(dB)을 나타내는 k-rate
+    this.compressor.attack.setValueAtTime(0, this.audioContext.currentTime); // 게인을 10dB만큼 줄이는 데 필요한 시간(초)을 나타내는 k-rate
+    this.compressor.release.setValueAtTime(0.25, this.audioContext.currentTime); // 이득을 10dB 증가시키는 데 필요한 시간(초)을 나타내는 k-rate
 
     this.isCompressionActive = false;
 
@@ -38,6 +36,8 @@ export class AudioController {
     this.gainNode.connect(this.analyser);
     this.analyser.connect(this.audioContext.destination);
 
+    this.totalDuration = 0;
+    this.playbackRate = 1;
     this.startTime = 0;
     this.pauseTime = 0;
     this.lastVolume = 1;
@@ -73,7 +73,7 @@ export class AudioController {
     try {
       const response = await fetch(url);
       const arrayBuffer = await response.arrayBuffer();
-      this.audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+      this.audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer); // 오디오 파일을 생성
       this.totalDuration = this.audioBuffer.duration;
     } catch (error) {
       console.error("오디오 로딩 오류: ", error);
@@ -85,7 +85,7 @@ export class AudioController {
       if (this.isPlaying && this.sourceNode) {
         this.pause();
       }
-      this.sourceNode = this.audioContext.createBufferSource();
+      this.sourceNode = this.audioContext.createBufferSource(); //오디오 데이터를 재생하는 데 사용
       this.sourceNode.buffer = this.audioBuffer;
       this.sourceNode.connect(this.gainNode);
       this.sourceNode.start(0, this.pauseTime);
