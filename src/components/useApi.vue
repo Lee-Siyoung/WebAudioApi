@@ -49,26 +49,39 @@
     </div>
     <canvas ref="canvas" width="400" height="200"></canvas>
     <div id="waveform-container" style="width: 100%; overflow-x: auto">
+      <h3>WebAudioApi로 만듬</h3>
       <canvas ref="timeScale" height="20"></canvas>
       <canvas ref="waveform"></canvas>
+    </div>
+    <div>
+      <div id="waveform-container" style="width: 100%; overflow-x: auto">
+        <h3>.pcm파일로 만듬</h3>
+        <canvas ref="timeScale2" height="20"></canvas>
+        <canvas ref="waveform2"></canvas>
+      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref, watch } from "vue";
+import { computed, defineComponent, onMounted, ref, watch } from "vue";
 import { useAudio } from "@/utils/useAudio";
 import { useAudioVisualizer } from "@/utils/useAudioVisualizer";
 import { waveForm } from "@/utils/waveForm";
 import { formatTime } from "@/utils/FormatTime";
 import { AudioController } from "@/utils/AudioController";
 import { useRouter } from "vue-router";
+import { pcm } from "@/utils/pcm";
 export default defineComponent({
   setup() {
     const router = useRouter();
     const canvas = ref<HTMLCanvasElement | null>(null);
     const waveform = ref<HTMLCanvasElement | null>(null);
     const timeScale = ref<HTMLCanvasElement | null>(null);
+
+    const waveform2 = ref<HTMLCanvasElement | null>(null);
+    const timeScale2 = ref<HTMLCanvasElement | null>(null);
+
     const audioController = new AudioController();
     const {
       play,
@@ -80,9 +93,11 @@ export default defineComponent({
       updatePlaybackRate,
       Compression,
       setCurrentTime,
-    } = useAudio("../assets/test.mp3", audioController);
+    } = useAudio("../assets/video30s.mp4", audioController);
     const formatCurrentTime = computed(() => formatTime(state.currentTime));
     const formatTotalTime = computed(() => formatTime(state.totalTime));
+
+    let arrayBuffer: ArrayBuffer;
 
     const { startVisualize, pauseVisualize } = useAudioVisualizer(
       audioController,
@@ -93,6 +108,9 @@ export default defineComponent({
       waveform,
       timeScale
     );
+
+    let viewPcm: { startWave2: () => void; pauseWave2: () => void };
+
     const handleTimeChange = (event: Event) => {
       const target = event.target as HTMLInputElement;
       const newTime = parseFloat(target.value);
@@ -103,11 +121,13 @@ export default defineComponent({
       play();
       startVisualize();
       startWave();
+      viewPcm.startWave2();
     };
     const handlePause = () => {
       pause();
       pauseVisualize();
       pauseWave();
+      viewPcm.pauseWave2();
     };
     const handleStop = () => {
       stop();
@@ -115,6 +135,8 @@ export default defineComponent({
       startWave();
       pauseVisualize();
       pauseWave();
+      viewPcm.startWave2();
+      viewPcm.pauseWave2();
     };
 
     const goNotApiPage = () => {
@@ -129,9 +151,20 @@ export default defineComponent({
           startWave();
           pauseVisualize();
           pauseWave();
+          viewPcm.startWave2();
+          viewPcm.pauseWave2();
         }
       }
     );
+
+    onMounted(async () => {
+      const response = await fetch("../assets/video30s.pcm");
+      if (!response.ok) {
+        throw new Error("network resopnse was not ok");
+      }
+      arrayBuffer = await response.arrayBuffer();
+      viewPcm = pcm(audioController, waveform2, timeScale2, arrayBuffer);
+    });
 
     return {
       mute,
@@ -141,6 +174,8 @@ export default defineComponent({
       canvas,
       waveform,
       timeScale,
+      waveform2,
+      timeScale2,
       Compression,
       setCurrentTime,
       handleTimeChange,
