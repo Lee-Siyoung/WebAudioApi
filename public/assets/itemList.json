@@ -1,0 +1,47 @@
+{
+  "total": 3,
+  "datas": [
+    {
+      "id": "1",
+      "type": "video",
+      "title": "30초영상",
+      "src": "video/video30s.mp4",
+      "ori": "video/video30s.mp4",
+      "duration": 29.4895,
+      "in": 0,
+      "out": 0,
+      "meta": {
+        "framerate": 25.0,
+        "df": false,
+        "aspectratio": 1.778,
+        "frames": 750,
+        "audio": true,
+        "size": {
+          "width": 1280,
+          "height": 720
+        }
+      }
+    },
+    {
+      "id": "2",
+      "type": "audio",
+      "title": "긴 오디오",
+      "src": "audio/test.mp3",
+      "ori": "audio/test.mp3",
+      "thumb": "",
+      "extraDatas": "",
+      "duration": 252.22897916666668,
+      "in": 0,
+      "out": 0,
+      "meta": {
+        "framerate": 41.667,
+        "df": false,
+        "aspectratio": 1.778,
+        "frames": 10500.084,
+        "audio": true,
+        "samplerate": "48K",
+        "audioBitrate": "320K"
+      }
+    }
+  ]
+}

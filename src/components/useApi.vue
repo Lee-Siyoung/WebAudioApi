@@ -1,8 +1,5 @@
 <template>
   <div>
-    <button @click="goNotApiPage">Next Page</button>
-  </div>
-  <div>
     <button @click="handlePlay">Play</button>
     <button @click="handlePause">Pause</button>
     <button @click="handleStop">Stop</button>
@@ -48,14 +45,14 @@
       <p>PlayRate: {{ state.playbackRate }}</p>
     </div>
     <canvas ref="canvas" width="400" height="200"></canvas>
+    <h3>WebAudioApi로 만듬</h3>
     <div id="waveform-container" style="width: 100%; overflow-x: auto">
-      <h3>WebAudioApi로 만듬</h3>
       <canvas ref="timeScale" height="20"></canvas>
       <canvas ref="waveform"></canvas>
     </div>
     <div>
+      <h3>pcm파일로 만듬</h3>
       <div id="waveform-container" style="width: 100%; overflow-x: auto">
-        <h3>.pcm파일로 만듬</h3>
         <canvas ref="timeScale2" height="20"></canvas>
         <canvas ref="waveform2"></canvas>
       </div>
@@ -66,15 +63,13 @@
 <script lang="ts">
 import { computed, defineComponent, onMounted, ref, watch } from "vue";
 import { useAudio } from "@/utils/useAudio";
-import { useAudioVisualizer } from "@/utils/useAudioVisualizer";
+import { audioVisualizer } from "@/utils/audioVisualizer";
 import { waveForm } from "@/utils/waveForm";
 import { formatTime } from "@/utils/FormatTime";
 import { AudioController } from "@/utils/AudioController";
-import { useRouter } from "vue-router";
 import { pcm } from "@/utils/pcm";
 export default defineComponent({
   setup() {
-    const router = useRouter();
     const canvas = ref<HTMLCanvasElement | null>(null);
     const waveform = ref<HTMLCanvasElement | null>(null);
     const timeScale = ref<HTMLCanvasElement | null>(null);
@@ -93,13 +88,13 @@ export default defineComponent({
       updatePlaybackRate,
       Compression,
       setCurrentTime,
-    } = useAudio("../assets/video30s.mp4", audioController);
+    } = useAudio("../assets/audio/test.mp3", audioController);
     const formatCurrentTime = computed(() => formatTime(state.currentTime));
     const formatTotalTime = computed(() => formatTime(state.totalTime));
 
     let arrayBuffer: ArrayBuffer;
 
-    const { startVisualize, pauseVisualize } = useAudioVisualizer(
+    const { startVisualize, pauseVisualize } = audioVisualizer(
       audioController,
       canvas
     );
@@ -139,10 +134,6 @@ export default defineComponent({
       viewPcm.pauseWave2();
     };
 
-    const goNotApiPage = () => {
-      router.push({ name: "notApi" });
-    };
-
     watch(
       () => state.isLoaded,
       (isLoaded) => {
@@ -158,11 +149,11 @@ export default defineComponent({
     );
 
     onMounted(async () => {
-      const response = await fetch("../assets/video30s.pcm");
+      const response = await fetch("../assets/pcm/test.pcm");
       if (!response.ok) {
         throw new Error("network resopnse was not ok");
       }
-      arrayBuffer = await response.arrayBuffer();
+      arrayBuffer = await response.arrayBuffer(); // 파일의 원시 바이너리 데이터
       viewPcm = pcm(audioController, waveform2, timeScale2, arrayBuffer);
     });
 
@@ -184,7 +175,6 @@ export default defineComponent({
       handlePause,
       handlePlay,
       handleStop,
-      goNotApiPage,
     };
   },
 });

@@ -15,13 +15,14 @@ export const pcm = (
     if (!waveFrom || !timeScale) return;
     const ctx = waveFrom.getContext("2d");
     const timeCtx = timeScale.getContext("2d");
+
     const dataView = new DataView(pcmData);
-    const numSamples = pcmData.byteLength / 2;
+    const numSamples = pcmData.byteLength / 2; // 파일에 포함된 샘플의 총 갯수. /2는 각 샘플이 2bite(16bit)로 표현됐기 때문
     const data = new Float32Array(numSamples);
 
     for (let i = 0; i < numSamples; i++) {
       const int16 = dataView.getInt16(i * 2, true);
-      data[i] = int16 / 32768.0;
+      data[i] = int16 / 32768.0; // -1.0 ~ 1.0 사이로 정규화
     }
 
     const audioBuffer = audioController.getAudioBuffer();

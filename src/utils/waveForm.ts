@@ -34,7 +34,7 @@ export const waveForm = (
     const step = Math.ceil(bufferLength / waveFrom.width);
     const amp = waveFrom.height / 2;
     const currentTime = audioController.getCurrentTime();
-
+    //console.log("data1: " + data);
     ctx.clearRect(0, 0, waveFrom.width, waveFrom.height);
 
     ctx.fillStyle = "white";
