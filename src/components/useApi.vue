@@ -1,5 +1,10 @@
 <template>
   <div>
+    <button v-for="item in items" :key="item.id" :id="`button${item.id}`">
+      Test {{ item.id }}
+    </button>
+  </div>
+  <div>
     <button @click="handlePlay">Play</button>
     <button @click="handlePause">Pause</button>
     <button @click="handleStop">Stop</button>
@@ -68,8 +73,12 @@ import { waveForm } from "@/utils/waveForm";
 import { formatTime } from "@/utils/FormatTime";
 import { AudioController } from "@/utils/AudioController";
 import { pcm } from "@/utils/pcm";
+import { ItemData } from "@/types/itemList";
+import item from "@/utils/item";
 export default defineComponent({
   setup() {
+    const items = ref<ItemData[]>([]);
+
     const canvas = ref<HTMLCanvasElement | null>(null);
     const waveform = ref<HTMLCanvasElement | null>(null);
     const timeScale = ref<HTMLCanvasElement | null>(null);
@@ -149,6 +158,7 @@ export default defineComponent({
     );
 
     onMounted(async () => {
+      items.value = item.getItem();
       const response = await fetch("../assets/pcm/test.pcm");
       if (!response.ok) {
         throw new Error("network resopnse was not ok");
@@ -158,6 +168,7 @@ export default defineComponent({
     });
 
     return {
+      items,
       mute,
       state,
       updateVolume,
