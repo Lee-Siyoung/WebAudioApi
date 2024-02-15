@@ -1,6 +1,11 @@
 <template>
   <div>
-    <button v-for="item in items" :key="item.id" :id="`button${item.id}`">
+    <button
+      v-for="item in items"
+      :key="item.id"
+      :id="`button${item.id}`"
+      @click="changeSrc(item.src)"
+    >
       Test {{ item.id }}
     </button>
   </div>
@@ -66,7 +71,14 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, ref, watch } from "vue";
+import {
+  computed,
+  defineComponent,
+  onMounted,
+  reactive,
+  ref,
+  watch,
+} from "vue";
 import { useAudio } from "@/utils/useAudio";
 import { audioVisualizer } from "@/utils/audioVisualizer";
 import { waveForm } from "@/utils/waveForm";
@@ -77,8 +89,10 @@ import { ItemData } from "@/types/itemList";
 import item from "@/utils/item";
 export default defineComponent({
   setup() {
+    const apiState = reactive({
+      src: "../assets/video/video30s.mp4",
+    });
     const items = ref<ItemData[]>([]);
-
     const canvas = ref<HTMLCanvasElement | null>(null);
     const waveform = ref<HTMLCanvasElement | null>(null);
     const timeScale = ref<HTMLCanvasElement | null>(null);
@@ -87,6 +101,7 @@ export default defineComponent({
     const timeScale2 = ref<HTMLCanvasElement | null>(null);
 
     const audioController = new AudioController();
+
     const {
       play,
       pause,
@@ -97,7 +112,8 @@ export default defineComponent({
       updatePlaybackRate,
       Compression,
       setCurrentTime,
-    } = useAudio("../assets/audio/test.mp3", audioController);
+      loadAudio,
+    } = useAudio(apiState.src, audioController);
     const formatCurrentTime = computed(() => formatTime(state.currentTime));
     const formatTotalTime = computed(() => formatTime(state.totalTime));
 
@@ -119,6 +135,10 @@ export default defineComponent({
       const target = event.target as HTMLInputElement;
       const newTime = parseFloat(target.value);
       setCurrentTime(newTime);
+    };
+
+    const changeSrc = async (src: string) => {
+      await loadAudio("../assets/" + src);
     };
 
     const handlePlay = () => {
@@ -159,7 +179,7 @@ export default defineComponent({
 
     onMounted(async () => {
       items.value = item.getItem();
-      const response = await fetch("../assets/pcm/test.pcm");
+      const response = await fetch("../assets/pcm/video30s.pcm");
       if (!response.ok) {
         throw new Error("network resopnse was not ok");
       }
@@ -168,6 +188,7 @@ export default defineComponent({
     });
 
     return {
+      apiState,
       items,
       mute,
       state,
@@ -179,13 +200,13 @@ export default defineComponent({
       waveform2,
       timeScale2,
       Compression,
-      setCurrentTime,
       handleTimeChange,
       formatCurrentTime,
       formatTotalTime,
       handlePause,
       handlePlay,
       handleStop,
+      changeSrc,
     };
   },
 });

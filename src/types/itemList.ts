@@ -1,5 +1,5 @@
 export interface ItemData {
-  id: number;
+  id: string;
   src: string;
   duration: number;
 }
