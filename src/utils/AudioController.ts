@@ -10,8 +10,9 @@ export class AudioController {
   private lastVolume: number;
   private totalDuration: number;
   private playbackRate: number;
-  public isPlaying: boolean;
   private isCompressionActive: boolean;
+  public isPlaying: boolean;
+  public arrayBufferPcm?: ArrayBuffer;
 
   constructor() {
     this.audioContext = new AudioContext();
@@ -69,18 +70,21 @@ export class AudioController {
     this.isCompressionActive = !this.isCompressionActive;
   }
 
-  async loadAudio(src: string): Promise<void> {
+  async loadAudio(src: string, pcm: string): Promise<void> {
     try {
       const response = await fetch(src);
       const arrayBuffer = await response.arrayBuffer();
       this.audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer); // 오디오 파일을 생성
       this.totalDuration = this.audioBuffer.duration;
+
+      const responsePcm = await fetch(pcm);
+      this.arrayBufferPcm = await responsePcm.arrayBuffer(); // 파일의 원시 바이너리 데이터
     } catch (error) {
       console.error("오디오 로딩 오류: ", error);
     }
   }
 
-  async resetAudio(src: string): Promise<void> {
+  async resetAudio(src: string, pcm: string): Promise<void> {
     if (this.sourceNode) {
       this.sourceNode.disconnect();
       this.sourceNode = undefined;
@@ -92,6 +96,10 @@ export class AudioController {
       const arrayBuffer = await response.arrayBuffer();
       this.audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer); // 오디오 파일을 생성
       this.totalDuration = this.audioBuffer.duration;
+      this.pauseTime = 0;
+
+      const responsePcm = await fetch(pcm);
+      this.arrayBufferPcm = await responsePcm.arrayBuffer(); // 파일의 원시 바이너리 데이터
     } catch (error) {
       console.error("오디오 로딩 오류: ", error);
     }

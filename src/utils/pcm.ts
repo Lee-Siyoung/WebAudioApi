@@ -4,18 +4,18 @@ import { formatTime } from "./FormatTime";
 export const pcm = (
   audioController: AudioController,
   waveFromRef: Ref<HTMLCanvasElement | null>,
-  timeScaleRef: Ref<HTMLCanvasElement | null>,
-  pcmData: ArrayBuffer
+  timeScaleRef: Ref<HTMLCanvasElement | null>
 ) => {
   const animationId = ref<number | null>(null);
 
   const draw = () => {
     const waveFrom = waveFromRef.value;
     const timeScale = timeScaleRef.value;
-    if (!waveFrom || !timeScale) return;
+    if (!waveFrom || !timeScale || !audioController.arrayBufferPcm) return;
     const ctx = waveFrom.getContext("2d");
     const timeCtx = timeScale.getContext("2d");
 
+    const pcmData = audioController.arrayBufferPcm;
     const dataView = new DataView(pcmData);
     const numSamples = pcmData.byteLength / 2; // 파일에 포함된 샘플의 총 갯수. /2는 각 샘플이 2bite(16bit)로 표현됐기 때문
     const data = new Float32Array(numSamples);
@@ -86,16 +86,16 @@ export const pcm = (
     animationId.value = requestAnimationFrame(draw);
   };
 
-  const startWave2 = () => {
+  const startWavePcm = () => {
     if (animationId.value !== null) {
       cancelAnimationFrame(animationId.value);
     }
     draw();
   };
-  const pauseWave2 = () => {
+  const pauseWavePcm = () => {
     if (animationId.value !== null) {
       cancelAnimationFrame(animationId.value);
     }
   };
-  return { startWave2, pauseWave2 };
+  return { startWavePcm, pauseWavePcm };
 };

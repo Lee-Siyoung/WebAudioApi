@@ -1,7 +1,7 @@
 import { reactive, ref } from "vue";
 import { AudioController } from "./AudioController";
 
-export function useAudio(src: string) {
+export function useAudio(src: string, pcm: string) {
   const audioController = ref(new AudioController());
   const state = reactive({
     volume: 1,
@@ -21,16 +21,16 @@ export function useAudio(src: string) {
     audioController.value.setCurrentTime(time);
   };
 
-  const resetAudio = async (src: string) => {
-    await audioController.value.resetAudio(src);
-  };
-
-  const loadAudio = async (newSrc: string) => {
-    await audioController.value.loadAudio(newSrc);
+  const loadAudio = async (newSrc: string, newPcm: string) => {
+    await audioController.value.loadAudio(newSrc, newPcm);
     state.isLoaded = true;
     state.totalTime = audioController.value.getTotalDuration();
   };
 
+  const resetAudio = async (src: string, pcm: string) => {
+    await audioController.value.resetAudio(src, pcm);
+    state.totalTime = audioController.value.getTotalDuration();
+  };
   const play = () => {
     if (state.isLoaded) {
       audioController.value.play();
@@ -65,7 +65,7 @@ export function useAudio(src: string) {
     state.isCompressionActive = !state.isCompressionActive;
   };
 
-  loadAudio(src);
+  loadAudio(src, pcm);
 
   return {
     play,

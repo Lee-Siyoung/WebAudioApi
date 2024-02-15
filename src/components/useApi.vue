@@ -4,7 +4,7 @@
       v-for="item in items"
       :key="item.id"
       :id="`button${item.id}`"
-      @click="changeSrc(item.src)"
+      @click="changeSrc(item.src, item.pcm)"
     >
       Test {{ item.id }}
     </button>
@@ -91,12 +91,12 @@ export default defineComponent({
   setup() {
     const apiState = reactive({
       src: "../assets/video/video30s.mp4",
+      pcm: "../assets/pcm/video30s.pcm",
     });
     const items = ref<ItemData[]>([]);
     const canvas = ref<HTMLCanvasElement | null>(null);
     const waveform = ref<HTMLCanvasElement | null>(null);
     const timeScale = ref<HTMLCanvasElement | null>(null);
-
     const waveform2 = ref<HTMLCanvasElement | null>(null);
     const timeScale2 = ref<HTMLCanvasElement | null>(null);
 
@@ -112,11 +112,9 @@ export default defineComponent({
       setCurrentTime,
       resetAudio,
       audioController,
-    } = useAudio(apiState.src);
+    } = useAudio(apiState.src, apiState.pcm);
     const formatCurrentTime = computed(() => formatTime(state.currentTime));
     const formatTotalTime = computed(() => formatTime(state.totalTime));
-
-    let arrayBuffer: ArrayBuffer;
 
     const { startVisualize, pauseVisualize } = audioVisualizer(
       audioController.value as AudioController,
@@ -128,7 +126,11 @@ export default defineComponent({
       timeScale
     );
 
-    let viewPcm: { startWave2: () => void; pauseWave2: () => void };
+    const { startWavePcm, pauseWavePcm } = pcm(
+      audioController.value as AudioController,
+      waveform2,
+      timeScale2
+    );
 
     const handleTimeChange = (event: Event) => {
       const target = event.target as HTMLInputElement;
@@ -136,21 +138,21 @@ export default defineComponent({
       setCurrentTime(newTime);
     };
 
-    const changeSrc = async (src: string) => {
-      await resetAudio("../assets/" + src);
+    const changeSrc = async (src: string, pcm: string) => {
+      await resetAudio("../assets/" + src, "../assets/" + pcm);
     };
 
     const handlePlay = () => {
       play();
       startVisualize();
       startWave();
-      viewPcm.startWave2();
+      startWavePcm();
     };
     const handlePause = () => {
       pause();
       pauseVisualize();
       pauseWave();
-      viewPcm.pauseWave2();
+      pauseWavePcm();
     };
     const handleStop = () => {
       stop();
@@ -158,8 +160,8 @@ export default defineComponent({
       startWave();
       pauseVisualize();
       pauseWave();
-      viewPcm.startWave2();
-      viewPcm.pauseWave2();
+      startWavePcm();
+      pauseWavePcm();
     };
 
     watch(
@@ -170,25 +172,14 @@ export default defineComponent({
           startWave();
           pauseVisualize();
           pauseWave();
-          viewPcm.startWave2();
-          viewPcm.pauseWave2();
+          startWavePcm();
+          pauseWavePcm();
         }
       }
     );
 
     onMounted(async () => {
       items.value = item.getItem();
-      const response = await fetch("../assets/pcm/video30s.pcm");
-      if (!response.ok) {
-        throw new Error("network resopnse was not ok");
-      }
-      arrayBuffer = await response.arrayBuffer(); // 파일의 원시 바이너리 데이터
-      viewPcm = pcm(
-        audioController.value as AudioController,
-        waveform2,
-        timeScale2,
-        arrayBuffer
-      );
     });
 
     return {
