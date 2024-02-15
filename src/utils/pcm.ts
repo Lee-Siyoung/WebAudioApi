@@ -27,10 +27,9 @@ export const pcm = (
 
     const audioBuffer = audioController.getAudioBuffer();
     if (!ctx || !timeCtx || !audioBuffer) return;
-
+    waveFrom.width = timeScale.width = 0;
     const bufferLength = data.length;
     const duration = audioBuffer.duration;
-
     const timeScaleInterval = 5;
     const totalMarkers = Math.floor(duration / timeScaleInterval);
     const pixelPerSecond = 20;

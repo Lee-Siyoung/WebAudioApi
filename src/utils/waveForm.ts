@@ -23,6 +23,7 @@ export const waveForm = (
     const timeScaleInterval = 5;
     const totalMarkers = Math.floor(duration / timeScaleInterval);
     const pixelPerSecond = 20;
+    waveFrom.width = timeScale.width = 0;
     const totalWidth = Math.max(
       waveFrom.clientWidth,
       pixelPerSecond *
@@ -34,9 +35,8 @@ export const waveForm = (
     const step = Math.ceil(bufferLength / waveFrom.width);
     const amp = waveFrom.height / 2;
     const currentTime = audioController.getCurrentTime();
-    //console.log("data1: " + data);
-    ctx.clearRect(0, 0, waveFrom.width, waveFrom.height);
 
+    ctx.clearRect(0, 0, waveFrom.width, waveFrom.height);
     ctx.fillStyle = "white";
     ctx.fillRect(0, 0, waveFrom.width, waveFrom.height);
     ctx.beginPath();

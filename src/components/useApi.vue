@@ -56,13 +56,13 @@
     </div>
     <canvas ref="canvas" width="400" height="200"></canvas>
     <h3>WebAudioApi로 만듬</h3>
-    <div id="waveform-container" style="width: 100%; overflow-x: auto">
+    <div id="waveform-container" style="width: 70%; overflow-x: auto">
       <canvas ref="timeScale" height="20"></canvas>
       <canvas ref="waveform"></canvas>
     </div>
     <div>
       <h3>pcm파일로 만듬</h3>
-      <div id="waveform-container" style="width: 100%; overflow-x: auto">
+      <div id="waveform-container" style="width: 70%; overflow-x: auto">
         <canvas ref="timeScale2" height="20"></canvas>
         <canvas ref="waveform2"></canvas>
       </div>
