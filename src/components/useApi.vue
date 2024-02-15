@@ -21,6 +21,7 @@
       {{ state.isCompressionActive ? "압축" : "압축 품" }}
     </button>
     <div>
+      <p>재생 바</p>
       <input
         type="range"
         min="0"
@@ -183,8 +184,6 @@ export default defineComponent({
     const handlePause = () => {
       pause();
       pauseVisualize();
-      pauseWave();
-      pauseWavePcm();
     };
     const handleStop = () => {
       stop();
@@ -201,12 +200,7 @@ export default defineComponent({
       (isLoaded) => {
         if (isLoaded) {
           startVisualize();
-          startWave();
           pauseVisualize();
-          pauseWave();
-          startWavePcm();
-          pauseWavePcm();
-
           drawWaveForm();
           drawWavePcm();
         }
