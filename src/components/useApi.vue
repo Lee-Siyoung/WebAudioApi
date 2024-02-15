@@ -206,6 +206,14 @@ export default defineComponent({
         }
       }
     );
+    watch(
+      [() => state.currentTime, () => state.totalTime],
+      ([currentTime, totalTime]) => {
+        if (Math.abs(currentTime - totalTime) < 0.1) {
+          handleStop();
+        }
+      }
+    );
 
     onMounted(async () => {
       items.value = item.getItem();
