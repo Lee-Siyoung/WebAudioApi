@@ -100,8 +100,6 @@ export default defineComponent({
     const waveform2 = ref<HTMLCanvasElement | null>(null);
     const timeScale2 = ref<HTMLCanvasElement | null>(null);
 
-    const audioController = new AudioController();
-
     const {
       play,
       pause,
@@ -112,19 +110,20 @@ export default defineComponent({
       updatePlaybackRate,
       Compression,
       setCurrentTime,
-      loadAudio,
-    } = useAudio(apiState.src, audioController);
+      resetAudio,
+      audioController,
+    } = useAudio(apiState.src);
     const formatCurrentTime = computed(() => formatTime(state.currentTime));
     const formatTotalTime = computed(() => formatTime(state.totalTime));
 
     let arrayBuffer: ArrayBuffer;
 
     const { startVisualize, pauseVisualize } = audioVisualizer(
-      audioController,
+      audioController.value as AudioController,
       canvas
     );
     const { startWave, pauseWave } = waveForm(
-      audioController,
+      audioController.value as AudioController,
       waveform,
       timeScale
     );
@@ -138,7 +137,7 @@ export default defineComponent({
     };
 
     const changeSrc = async (src: string) => {
-      await loadAudio("../assets/" + src);
+      await resetAudio("../assets/" + src);
     };
 
     const handlePlay = () => {
@@ -184,7 +183,12 @@ export default defineComponent({
         throw new Error("network resopnse was not ok");
       }
       arrayBuffer = await response.arrayBuffer(); // 파일의 원시 바이너리 데이터
-      viewPcm = pcm(audioController, waveform2, timeScale2, arrayBuffer);
+      viewPcm = pcm(
+        audioController.value as AudioController,
+        waveform2,
+        timeScale2,
+        arrayBuffer
+      );
     });
 
     return {

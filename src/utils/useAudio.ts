@@ -1,7 +1,8 @@
-import { reactive } from "vue";
+import { reactive, ref } from "vue";
 import { AudioController } from "./AudioController";
 
-export function useAudio(src: string, audioController: AudioController) {
+export function useAudio(src: string) {
+  const audioController = ref(new AudioController());
   const state = reactive({
     volume: 1,
     playbackRate: 1,
@@ -13,50 +14,54 @@ export function useAudio(src: string, audioController: AudioController) {
   });
 
   setInterval(() => {
-    state.currentTime = audioController.getCurrentTime();
+    state.currentTime = audioController.value.getCurrentTime();
   }, 100);
 
   const setCurrentTime = (time: number) => {
-    audioController.setCurrentTime(time);
+    audioController.value.setCurrentTime(time);
+  };
+
+  const resetAudio = async (src: string) => {
+    await audioController.value.resetAudio(src);
   };
 
   const loadAudio = async (newSrc: string) => {
-    await audioController.loadAudio(newSrc);
+    await audioController.value.loadAudio(newSrc);
     state.isLoaded = true;
-    state.totalTime = audioController.getTotalDuration();
+    state.totalTime = audioController.value.getTotalDuration();
   };
 
   const play = () => {
     if (state.isLoaded) {
-      audioController.play();
+      audioController.value.play();
     }
   };
 
   const pause = () => {
-    audioController.pause();
+    audioController.value.pause();
   };
 
   const stop = () => {
-    audioController.stop();
+    audioController.value.stop();
   };
 
   const mute = () => {
-    audioController.mute();
+    audioController.value.mute();
     state.isMute = !state.isMute;
   };
 
   const updateVolume = (newVolume: number) => {
     state.volume = newVolume;
-    audioController.setVolume(state.volume);
+    audioController.value.setVolume(state.volume);
   };
 
   const updatePlaybackRate = (newRate: number) => {
     state.playbackRate = newRate;
-    audioController.setPlaybackRate(state.playbackRate);
+    audioController.value.setPlaybackRate(state.playbackRate);
   };
 
   const Compression = () => {
-    audioController.Compression();
+    audioController.value.Compression();
     state.isCompressionActive = !state.isCompressionActive;
   };
 
@@ -72,6 +77,7 @@ export function useAudio(src: string, audioController: AudioController) {
     updatePlaybackRate,
     Compression,
     setCurrentTime,
-    loadAudio,
+    resetAudio,
+    audioController,
   };
 }

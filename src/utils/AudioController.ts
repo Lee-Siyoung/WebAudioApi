@@ -69,9 +69,26 @@ export class AudioController {
     this.isCompressionActive = !this.isCompressionActive;
   }
 
-  async loadAudio(url: string): Promise<void> {
+  async loadAudio(src: string): Promise<void> {
     try {
-      const response = await fetch(url);
+      const response = await fetch(src);
+      const arrayBuffer = await response.arrayBuffer();
+      this.audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer); // 오디오 파일을 생성
+      this.totalDuration = this.audioBuffer.duration;
+    } catch (error) {
+      console.error("오디오 로딩 오류: ", error);
+    }
+  }
+
+  async resetAudio(src: string): Promise<void> {
+    if (this.sourceNode) {
+      this.sourceNode.disconnect();
+      this.sourceNode = undefined;
+    }
+    this.isPlaying = false;
+
+    try {
+      const response = await fetch(src);
       const arrayBuffer = await response.arrayBuffer();
       this.audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer); // 오디오 파일을 생성
       this.totalDuration = this.audioBuffer.duration;
