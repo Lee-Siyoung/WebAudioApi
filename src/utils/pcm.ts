@@ -4,18 +4,20 @@ import { formatTime } from "./FormatTime";
 export const pcm = (
   audioController: AudioController,
   waveFromRef: Ref<HTMLCanvasElement | null>,
-  timeScaleRef: Ref<HTMLCanvasElement | null>
+  timeScaleRef: Ref<HTMLCanvasElement | null>,
+  timeLineRef: Ref<HTMLCanvasElement | null>
 ) => {
   const animationId = ref<number | null>(null);
 
-  const draw = () => {
+  const drawWavePcm = () => {
     const waveFrom = waveFromRef.value;
     const timeScale = timeScaleRef.value;
-    if (!waveFrom || !timeScale || !audioController.arrayBufferPcm) return;
+    const pcmData = audioController.arrayBufferPcm;
+    if (!waveFrom || !timeScale || !pcmData) return;
     const ctx = waveFrom.getContext("2d");
     const timeCtx = timeScale.getContext("2d");
-
-    const pcmData = audioController.arrayBufferPcm;
+    const audioBuffer = audioController.getAudioBuffer();
+    if (!ctx || !timeCtx || !audioBuffer) return;
     const dataView = new DataView(pcmData);
     const numSamples = pcmData.byteLength / 2; // 파일에 포함된 샘플의 총 갯수. /2는 각 샘플이 2bite(16bit)로 표현됐기 때문
     const data = new Float32Array(numSamples);
@@ -24,15 +26,13 @@ export const pcm = (
       const int16 = dataView.getInt16(i * 2, true);
       data[i] = int16 / 32768.0; // -1.0 ~ 1.0 사이로 정규화
     }
-
-    const audioBuffer = audioController.getAudioBuffer();
-    if (!ctx || !timeCtx || !audioBuffer) return;
-    waveFrom.width = timeScale.width = 0;
     const bufferLength = data.length;
     const duration = audioBuffer.duration;
+
     const timeScaleInterval = 5;
     const totalMarkers = Math.floor(duration / timeScaleInterval);
     const pixelPerSecond = 20;
+    waveFrom.width = timeScale.width = 0;
     const totalWidth = Math.max(
       waveFrom.clientWidth,
       pixelPerSecond *
@@ -43,7 +43,6 @@ export const pcm = (
 
     const step = Math.ceil(bufferLength / waveFrom.width);
     const amp = waveFrom.height / 2;
-    const currentTime = audioController.getCurrentTime();
 
     ctx.clearRect(0, 0, waveFrom.width, waveFrom.height);
 
@@ -62,16 +61,6 @@ export const pcm = (
       ctx.fillRect(i, (1 + min) * amp, 1, Math.max(1, (max - min) * amp));
       ctx.fillStyle = "#38f";
     }
-
-    // 시간 선
-    const x = (currentTime / duration) * waveFrom.width;
-    ctx.strokeStyle = "red";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x, waveFrom.height);
-    ctx.stroke();
-
     // 시간 글자
     timeCtx.clearRect(0, 0, timeScale.width, timeScale.height);
     timeCtx.fillStyle = "black";
@@ -82,6 +71,30 @@ export const pcm = (
       const x = pixelPerSecond * marketTime;
       timeCtx.fillText(formatTime(marketTime), x, 10);
     }
+  };
+
+  const draw = () => {
+    const waveFrom = waveFromRef.value;
+    const timeLine = timeLineRef.value;
+    if (!waveFrom || !timeLine) return;
+    const timeLineCtx = timeLine.getContext("2d");
+    const audioBuffer = audioController.getAudioBuffer();
+    if (!audioBuffer || !timeLineCtx) return;
+
+    const duration = audioBuffer.duration;
+
+    timeLine.width = waveFrom.width;
+
+    const currentTime = audioController.getCurrentTime();
+
+    // 시간 선
+    const x = (currentTime / duration) * waveFrom.width;
+    timeLineCtx.strokeStyle = "red";
+    timeLineCtx.lineWidth = 2;
+    timeLineCtx.beginPath();
+    timeLineCtx.moveTo(x, 0);
+    timeLineCtx.lineTo(x, waveFrom.height);
+    timeLineCtx.stroke();
     animationId.value = requestAnimationFrame(draw);
   };
 
@@ -96,5 +109,5 @@ export const pcm = (
       cancelAnimationFrame(animationId.value);
     }
   };
-  return { startWavePcm, pauseWavePcm };
+  return { startWavePcm, pauseWavePcm, drawWavePcm };
 };

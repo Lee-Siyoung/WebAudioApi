@@ -31,41 +31,67 @@
       />
       <p>{{ formatCurrentTime }} / {{ formatTotalTime }}</p>
     </div>
-    <div>
-      <label for="volumeControl">볼륨</label>
-      <input
-        type="range"
-        min="0"
-        max="2"
-        step="0.1"
-        v-model="state.volume"
-        @input="updateVolume(state.volume)"
-        :disabled="state.isMute"
-      />
-      <p>Volume: {{ state.volume }}</p>
-      <label for="playbackRate">재생 속도</label>
-      <input
-        type="range"
-        min="0.1"
-        max="2"
-        step="0.1"
-        v-model="state.playbackRate"
-        @input="updatePlaybackRate(state.playbackRate)"
-      />
-      <p>PlayRate: {{ state.playbackRate }}</p>
-    </div>
-    <canvas ref="canvas" width="400" height="200"></canvas>
-    <h3>WebAudioApi로 만듬</h3>
-    <div id="waveform-container" style="width: 70%; overflow-x: auto">
-      <canvas ref="timeScale" height="20"></canvas>
-      <canvas ref="waveform"></canvas>
-    </div>
-    <div>
-      <h3>pcm파일로 만듬</h3>
-      <div id="waveform-container" style="width: 70%; overflow-x: auto">
-        <canvas ref="timeScale2" height="20"></canvas>
-        <canvas ref="waveform2"></canvas>
+    <div class="Control-Container">
+      <div>
+        <label for="volumeControl">볼륨</label>
+        <div>
+          <input
+            type="range"
+            min="0"
+            max="2"
+            step="0.1"
+            v-model="state.volume"
+            @input="updateVolume(state.volume)"
+            :disabled="state.isMute"
+          />
+        </div>
+        <p>Volume: {{ state.volume }}</p>
+        <label for="playbackRate">재생 속도</label>
+        <div>
+          <input
+            type="range"
+            min="0.1"
+            max="2"
+            step="0.1"
+            v-model="state.playbackRate"
+            @input="updatePlaybackRate(state.playbackRate)"
+          />
+        </div>
+        <p>PlayRate: {{ state.playbackRate }}</p>
       </div>
+      <canvas
+        class="canvasRef"
+        ref="canvas"
+        width="400"
+        height="200"
+        style="margin-left: 100px"
+      ></canvas>
+    </div>
+    <h3>WebAudioApi로 만듬</h3>
+    <div
+      class="waveform-container"
+      style="width: 70%; overflow-x: auto; position: relative"
+    >
+      <canvas ref="timeScale" height="20"></canvas>
+      <canvas ref="waveform" height="100"></canvas>
+      <canvas
+        ref="timeLine"
+        height="100"
+        style="position: absolute; z-index: 10; left: 0; bottom: 0"
+      ></canvas>
+    </div>
+    <h3>pcm파일로 만듬</h3>
+    <div
+      class="waveform-container"
+      style="width: 70%; overflow-x: auto; position: relative"
+    >
+      <canvas ref="timeScale2" height="20"></canvas>
+      <canvas ref="waveform2" height="100"></canvas>
+      <canvas
+        ref="timeLine2"
+        height="100"
+        style="position: absolute; z-index: 10; left: 0; bottom: 0"
+      ></canvas>
     </div>
   </div>
 </template>
@@ -97,6 +123,8 @@ export default defineComponent({
     const canvas = ref<HTMLCanvasElement | null>(null);
     const waveform = ref<HTMLCanvasElement | null>(null);
     const timeScale = ref<HTMLCanvasElement | null>(null);
+    const timeLine = ref<HTMLCanvasElement | null>(null);
+    const timeLine2 = ref<HTMLCanvasElement | null>(null);
     const waveform2 = ref<HTMLCanvasElement | null>(null);
     const timeScale2 = ref<HTMLCanvasElement | null>(null);
 
@@ -120,16 +148,18 @@ export default defineComponent({
       audioController.value as AudioController,
       canvas
     );
-    const { startWave, pauseWave } = waveForm(
+    const { startWave, pauseWave, drawWaveForm } = waveForm(
       audioController.value as AudioController,
       waveform,
-      timeScale
+      timeScale,
+      timeLine
     );
 
-    const { startWavePcm, pauseWavePcm } = pcm(
+    const { startWavePcm, pauseWavePcm, drawWavePcm } = pcm(
       audioController.value as AudioController,
       waveform2,
-      timeScale2
+      timeScale2,
+      timeLine2
     );
 
     const handleTimeChange = (event: Event) => {
@@ -140,6 +170,8 @@ export default defineComponent({
 
     const changeSrc = async (src: string, pcm: string) => {
       await resetAudio("../assets/" + src, "../assets/" + pcm);
+      drawWaveForm();
+      drawWavePcm();
     };
 
     const handlePlay = () => {
@@ -174,6 +206,9 @@ export default defineComponent({
           pauseWave();
           startWavePcm();
           pauseWavePcm();
+
+          drawWaveForm();
+          drawWavePcm();
         }
       }
     );
@@ -194,6 +229,8 @@ export default defineComponent({
       timeScale,
       waveform2,
       timeScale2,
+      timeLine,
+      timeLine2,
       Compression,
       handleTimeChange,
       formatCurrentTime,
@@ -208,7 +245,11 @@ export default defineComponent({
 </script>
 
 <style>
-canvas {
+.waveform-container {
+  position: relative;
   display: block;
+}
+.Control-Container {
+  display: flex;
 }
 </style>
