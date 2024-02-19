@@ -86,10 +86,10 @@
       class="waveform-container"
       style="width: 70%; overflow-x: auto; position: relative"
     >
-      <canvas ref="timeScale2" height="20"></canvas>
-      <canvas ref="waveform2" height="100"></canvas>
+      <canvas ref="timeScalePcm" height="20"></canvas>
+      <canvas ref="waveformPcm" height="100"></canvas>
       <canvas
-        ref="timeLine2"
+        ref="timeLinePcm"
         height="100"
         style="position: absolute; z-index: 10; left: 0; bottom: 0"
       ></canvas>
@@ -116,7 +116,7 @@ import { ItemData } from "@/types/itemList";
 import item from "@/utils/item";
 export default defineComponent({
   setup() {
-    const apiState = reactive({
+    const initAudio = reactive({
       src: "../assets/video/video30s.mp4",
       pcm: "../assets/pcm/video30s.pcm",
     });
@@ -141,7 +141,7 @@ export default defineComponent({
       setCurrentTime,
       resetAudio,
       audioController,
-    } = useAudio(apiState.src, apiState.pcm);
+    } = useAudio(initAudio.src, initAudio.pcm);
     const formatCurrentTime = computed(() => formatTime(state.currentTime));
     const formatTotalTime = computed(() => formatTime(state.totalTime));
 
@@ -189,7 +189,7 @@ export default defineComponent({
       stop();
       startVisualize();
       startWave();
-      pauseVisualize();
+      //pauseVisualize();
       pauseWave();
       startWavePcm();
       pauseWavePcm();
@@ -220,7 +220,7 @@ export default defineComponent({
     });
 
     return {
-      apiState,
+      initAudio,
       items,
       mute,
       state,
