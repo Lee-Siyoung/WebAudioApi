@@ -125,9 +125,9 @@ export default defineComponent({
     const waveform = ref<HTMLCanvasElement | null>(null);
     const timeScale = ref<HTMLCanvasElement | null>(null);
     const timeLine = ref<HTMLCanvasElement | null>(null);
-    const timeLine2 = ref<HTMLCanvasElement | null>(null);
-    const waveform2 = ref<HTMLCanvasElement | null>(null);
-    const timeScale2 = ref<HTMLCanvasElement | null>(null);
+    const timeLinePcm = ref<HTMLCanvasElement | null>(null);
+    const waveformPcm = ref<HTMLCanvasElement | null>(null);
+    const timeScalePcm = ref<HTMLCanvasElement | null>(null);
 
     const {
       play,
@@ -158,9 +158,9 @@ export default defineComponent({
 
     const { startWavePcm, pauseWavePcm, drawWavePcm } = pcm(
       audioController.value as AudioController,
-      waveform2,
-      timeScale2,
-      timeLine2
+      waveformPcm,
+      timeScalePcm,
+      timeLinePcm
     );
 
     const handleTimeChange = (event: Event) => {
@@ -229,10 +229,10 @@ export default defineComponent({
       canvas,
       waveform,
       timeScale,
-      waveform2,
-      timeScale2,
+      waveformPcm,
+      timeScalePcm,
       timeLine,
-      timeLine2,
+      timeLinePcm,
       Compression,
       handleTimeChange,
       formatCurrentTime,
