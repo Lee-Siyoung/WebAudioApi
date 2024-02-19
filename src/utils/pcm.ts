@@ -9,15 +9,14 @@ export const pcm = (
 ) => {
   const animationId = ref<number | null>(null);
 
-  const drawWavePcm = () => {
+  const drawWavePcm = (duration: number) => {
     const waveFrom = waveFromRef.value;
     const timeScale = timeScaleRef.value;
     const pcmData = audioController.arrayBufferPcm;
     if (!waveFrom || !timeScale || !pcmData) return;
     const ctx = waveFrom.getContext("2d");
     const timeCtx = timeScale.getContext("2d");
-    const audioBuffer = audioController.getAudioBuffer();
-    if (!ctx || !timeCtx || !audioBuffer) return;
+    if (!ctx || !timeCtx) return;
     const dataView = new DataView(pcmData);
     const numSamples = pcmData.byteLength / 2; // 파일에 포함된 샘플의 총 갯수. /2는 각 샘플이 2bite(16bit)로 표현됐기 때문
     const data = new Float32Array(numSamples);
@@ -27,7 +26,6 @@ export const pcm = (
       data[i] = int16 / 32768.0; // -1.0 ~ 1.0 사이로 정규화
     }
     const bufferLength = data.length;
-    const duration = audioBuffer.duration;
 
     const timeScaleInterval = 5;
     const totalMarkers = Math.floor(duration / timeScaleInterval);
@@ -73,15 +71,12 @@ export const pcm = (
     }
   };
 
-  const draw = () => {
+  const draw = (duration: number) => {
     const waveFrom = waveFromRef.value;
     const timeLine = timeLineRef.value;
     if (!waveFrom || !timeLine) return;
     const timeLineCtx = timeLine.getContext("2d");
-    const audioBuffer = audioController.getAudioBuffer();
-    if (!audioBuffer || !timeLineCtx) return;
-
-    const duration = audioBuffer.duration;
+    if (!timeLineCtx) return;
 
     timeLine.width = waveFrom.width;
 
@@ -95,14 +90,14 @@ export const pcm = (
     timeLineCtx.moveTo(x, 0);
     timeLineCtx.lineTo(x, waveFrom.height);
     timeLineCtx.stroke();
-    animationId.value = requestAnimationFrame(draw);
+    animationId.value = requestAnimationFrame(() => draw(duration));
   };
 
-  const startWavePcm = () => {
+  const startWavePcm = (duration: number) => {
     if (animationId.value !== null) {
       cancelAnimationFrame(animationId.value);
     }
-    draw();
+    draw(duration);
   };
   const pauseWavePcm = () => {
     if (animationId.value !== null) {

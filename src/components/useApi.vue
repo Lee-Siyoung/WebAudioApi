@@ -4,7 +4,7 @@
       v-for="item in items"
       :key="item.id"
       :id="`button${item.id}`"
-      @click="changeSrc(item.src, item.pcm)"
+      @click="changeSrc(item.src, item.pcm, item.duration)"
     >
       Test {{ item.id }}
     </button>
@@ -119,6 +119,7 @@ export default defineComponent({
     const initAudio = reactive({
       src: "../assets/video/video30s.mp4",
       pcm: "../assets/pcm/video30s.pcm",
+      duration: 29.4895,
     });
     const items = ref<ItemData[]>([]);
     const canvas = ref<HTMLCanvasElement | null>(null);
@@ -169,17 +170,18 @@ export default defineComponent({
       setCurrentTime(newTime);
     };
 
-    const changeSrc = async (src: string, pcm: string) => {
+    const changeSrc = async (src: string, pcm: string, duration: number) => {
       await resetAudio("../assets/" + src, "../assets/" + pcm);
+      initAudio.duration = duration;
       drawWaveForm();
-      drawWavePcm();
+      drawWavePcm(initAudio.duration);
     };
 
     const handlePlay = () => {
       play();
       startVisualize();
       startWave();
-      startWavePcm();
+      startWavePcm(initAudio.duration);
     };
     const handlePause = () => {
       pause();
@@ -191,7 +193,7 @@ export default defineComponent({
       startWave();
       //pauseVisualize();
       pauseWave();
-      startWavePcm();
+      startWavePcm(initAudio.duration);
       pauseWavePcm();
     };
 
@@ -202,7 +204,7 @@ export default defineComponent({
           startVisualize();
           pauseVisualize();
           drawWaveForm();
-          drawWavePcm();
+          drawWavePcm(initAudio.duration);
         }
       }
     );
