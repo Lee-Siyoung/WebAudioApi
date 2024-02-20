@@ -3,6 +3,7 @@ export interface ItemData {
   src: string;
   pcm: string;
   duration: number;
+  samplerate: number;
 }
 
 export interface ItemList {

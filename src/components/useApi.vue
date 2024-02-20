@@ -4,7 +4,7 @@
       v-for="item in items"
       :key="item.id"
       :id="`button${item.id}`"
-      @click="changeSrc(item.src, item.pcm, item.duration)"
+      @click="changeSrc(item.src, item.pcm, item.duration, item.samplerate)"
     >
       Test {{ item.id }}
     </button>
@@ -61,12 +61,12 @@
         <p>PlayRate: {{ state.playbackRate }}</p>
       </div>
       <canvas
-        class="canvasRef"
         ref="canvas"
         width="400"
         height="200"
         style="margin-left: 100px"
       ></canvas>
+      <canvas ref="canvasPcm" width="400" height="200"></canvas>
     </div>
     <h3>WebAudioApi로 만듬</h3>
     <div
@@ -114,15 +114,18 @@ import { AudioController } from "@/utils/AudioController";
 import { pcm } from "@/utils/pcm";
 import { ItemData } from "@/types/itemList";
 import item from "@/utils/item";
+import { visualizerPcm } from "@/utils/visualizerPcm";
 export default defineComponent({
   setup() {
     const initAudio = reactive({
       src: "../assets/video/video30s.mp4",
       pcm: "../assets/pcm/video30s.pcm",
       duration: 29.4895,
+      samplerate: 44100,
     });
     const items = ref<ItemData[]>([]);
     const canvas = ref<HTMLCanvasElement | null>(null);
+    const canvasPcm = ref<HTMLCanvasElement | null>(null);
     const waveform = ref<HTMLCanvasElement | null>(null);
     const timeScale = ref<HTMLCanvasElement | null>(null);
     const timeLine = ref<HTMLCanvasElement | null>(null);
@@ -150,6 +153,11 @@ export default defineComponent({
       audioController.value as AudioController,
       canvas
     );
+    const { startVisualizePcm, pauseVisualizePcm } = visualizerPcm(
+      audioController.value as AudioController,
+      canvasPcm,
+      state
+    );
     const { startWave, pauseWave, drawWaveForm } = waveForm(
       audioController.value as AudioController,
       waveform,
@@ -170,26 +178,36 @@ export default defineComponent({
       setCurrentTime(newTime);
     };
 
-    const changeSrc = async (src: string, pcm: string, duration: number) => {
+    const changeSrc = async (
+      src: string,
+      pcm: string,
+      duration: number,
+      samplerate: number
+    ) => {
       await resetAudio("../assets/" + src, "../assets/" + pcm);
       initAudio.duration = duration;
+      initAudio.samplerate = samplerate;
       drawWaveForm();
       drawWavePcm(initAudio.duration);
+      //startVisualizePcm(initAudio.samplerate);
     };
 
     const handlePlay = () => {
       play();
       startVisualize();
+      //startVisualizePcm(initAudio.samplerate);
       startWave();
       startWavePcm(initAudio.duration);
     };
     const handlePause = () => {
       pause();
       pauseVisualize();
+      //pauseVisualizePcm();
     };
     const handleStop = () => {
       stop();
       startVisualize();
+      //startVisualizePcm(initAudio.samplerate);
       startWave();
       //pauseVisualize();
       pauseWave();
@@ -202,7 +220,9 @@ export default defineComponent({
       (isLoaded) => {
         if (isLoaded) {
           startVisualize();
+          //startVisualizePcm(initAudio.samplerate);
           pauseVisualize();
+          pauseVisualizePcm();
           drawWaveForm();
           drawWavePcm(initAudio.duration);
         }
@@ -229,6 +249,7 @@ export default defineComponent({
       updateVolume,
       updatePlaybackRate,
       canvas,
+      canvasPcm,
       waveform,
       timeScale,
       waveformPcm,

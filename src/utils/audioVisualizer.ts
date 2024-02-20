@@ -34,7 +34,7 @@ export const audioVisualizer = (
       if (i === 0) {
         ctx.moveTo(x, y);
       } else {
-        ctx.lineTo(x, y);
+        ctx.quadraticCurveTo(x - sliceWidth / 2, y, x, y);
       }
 
       x += sliceWidth;
