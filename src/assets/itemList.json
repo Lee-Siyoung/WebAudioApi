@@ -46,6 +46,29 @@
         "samplerate": "48K",
         "audioBitrate": "320K"
       }
+    },
+    {
+      "id": "3",
+      "type": "audio",
+      "title": "긴 오디오",
+      "src": "audio/testaudio3.mp3",
+      "ori": "audio/testaudio3.mp3",
+      "pcm": "pcm/testaudio3.pcm",
+      "samplerate": 44100,
+      "thumb": "",
+      "extraDatas": "",
+      "duration": 264,
+      "in": 0,
+      "out": 0,
+      "meta": {
+        "framerate": 38.281,
+        "df": false,
+        "aspectratio": 1.778,
+        "frames": 10500.084,
+        "audio": true,
+        "samplerate": "44.1K",
+        "audioBitrate": "320K"
+      }
     }
   ]
 }
